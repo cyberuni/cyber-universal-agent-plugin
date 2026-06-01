@@ -1,7 +1,7 @@
 # Universal Agent Plugin System — Specification
 
-**Status:** Draft v0.1  
-**Date:** June 2026  
+**Status:** Draft v0.1
+**Date:** June 2026
 **Repo:** cyberuni/cyber-universal-agent-plugin
 
 ---
@@ -38,7 +38,7 @@ The canonical plugin definition extends open-plugin-spec v1.0.0 with two additio
 
 ```json
 {
-  "$schema": "https://schema.cyberuni.dev/universal-agent-plugin/v1.json"
+  "$schema": "https://raw.githubusercontent.com/cyberuni/cyber-universal-agent-plugin/refs/heads/main/schema/v1.json"
 }
 ```
 
