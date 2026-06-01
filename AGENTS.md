@@ -12,6 +12,22 @@ When reading any `SKILL.md` file, check for augmentation files in the same direc
 
 Later layers extend and override earlier ones. Both `SKILL.project.md` and `SKILL.local.md` are ignored during `skills add` installation.
 
+## Commit Discipline
+
+**Auto-commit rule:** When a unit of work is complete and verified, commit it immediately — do not wait for the user to ask. Batching multiple units into one commit, or finishing all work before committing, are both violations of this rule.
+
+**Unit of work:** one coherent, independently revertable change — one domain's refactor, one feature, one bugfix, one test suite expansion for one concern, one config change. Never two unrelated concerns in the same commit. A TDD red-green-refactor cycle alone is not a commit boundary; commit when the full intended change is complete and tests pass. If the working tree has unrelated changes, leave them unstaged — commit the current unit first, then continue.
+
+- Conventional Commits: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`
+- One concern per commit; never batch unrelated changes
+- Stage only files for this unit: `git add <files>`, then verify with `git diff --cached`
+- Never use `git add .`, `git add -A`, or `git add -p` (interactive commands agents cannot run)
+- Never commit with red tests; run validation commands first
+
+### References
+
+- **`commit-work` skill** — staging, splitting, and message writing when committing
+
 ## Project overview
 
 `cyber-universal-agent-plugin` is a research and design project for a universal AI coding agent plugin — a single plugin bundle that works across Claude Code, Cursor, Codex, GitHub Copilot CLI, and other major runtimes.
