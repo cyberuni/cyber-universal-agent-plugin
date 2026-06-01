@@ -30,7 +30,7 @@ A viable "universal plugin" strategy generates or symlinks the four vendor-speci
 
 ## open-plugin-spec
 
-[open-plugin-spec](https://github.com/open-plugin-spec/open-plugin-spec) v1.0.0 is the closest thing to a cross-vendor standard. Its metadata fields (`name`, `version`, `description`, `author`, `homepage`, `repository`, `license`) and core component names (`commands`, `agents`, `hooks`, `mcpServers`) align with what Claude Code and Cursor actually implement.
+[open-plugin-spec](https://github.com/vercel-labs/open-plugin-spec) v1.0.0 is the closest thing to a cross-vendor standard. Its metadata fields (`name`, `version`, `description`, `author`, `homepage`, `repository`, `license`) and core component names (`commands`, `agents`, `hooks`, `mcpServers`) align with what Claude Code and Cursor actually implement.
 
 However, three of its central premises are contradicted by vendor reality:
 
