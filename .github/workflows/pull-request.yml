@@ -1,0 +1,22 @@
+name: pull-request
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "TODO: add your CI commands here"  # TODO: replace with actual commands
+
+  all-checks:
+    needs: [ci]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: All checks passed
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            exit 1
+          fi

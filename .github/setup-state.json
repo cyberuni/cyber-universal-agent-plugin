@@ -1,0 +1,77 @@
+{
+  "repo": "cyberuni/cyber-universal-agent-plugin",
+  "defaultBranch": "main",
+  "current": {
+    "deleteBranchOnMerge": true,
+    "allowAutoMerge": true,
+    "allowMergeCommit": false,
+    "allowSquashMerge": true,
+    "allowRebaseMerge": true,
+    "allowUpdateBranch": true,
+    "hasWiki": true,
+    "hasProjects": true,
+    "hasDiscussions": false,
+    "dependabotSecurityUpdates": "enabled",
+    "secretScanning": "disabled",
+    "secretScanningPushProtection": "disabled",
+    "defaultBranchRuleset": null
+  },
+  "detected": {
+    "language": null,
+    "codeqlLanguage": null,
+    "packageManager": null,
+    "hasPackageJson": false,
+    "hasDependabotConfig": false,
+    "existingWorkflows": []
+  },
+  "rows": [
+    {
+      "setting": "delete_branch_on_merge",
+      "current": "true",
+      "target": "true",
+      "action": "already set"
+    },
+    {
+      "setting": "allow_auto_merge",
+      "current": "true",
+      "target": "true",
+      "action": "already set"
+    },
+    {
+      "setting": "allow_merge_commit",
+      "current": "false",
+      "target": "false",
+      "action": "already set"
+    },
+    {
+      "setting": "allow_squash_merge",
+      "current": "true",
+      "target": "true",
+      "action": "already set"
+    },
+    {
+      "setting": "allow_rebase_merge",
+      "current": "true",
+      "target": "true",
+      "action": "already set"
+    },
+    {
+      "setting": "allow_update_branch",
+      "current": "true",
+      "target": "true",
+      "action": "already set"
+    },
+    {
+      "setting": "dependabot_security_updates",
+      "current": "enabled",
+      "target": "enabled",
+      "action": "already set"
+    },
+    {
+      "setting": "default branch ruleset",
+      "current": "none",
+      "target": "default-branch-protection",
+      "action": "will create"
+    }
+  ]
+}
