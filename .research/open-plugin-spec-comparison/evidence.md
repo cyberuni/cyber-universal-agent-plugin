@@ -101,3 +101,16 @@
 - **source.url**: https://github.com/vercel-labs/open-plugin-spec
 - **source.type**: Spec + Official schema
 - **notes**: The spec defines `rules` as an extended component type (Appendix D.3). Markdown files with YAML frontmatter: required `description`, optional `alwaysApply` (boolean), optional `globs`. File extension `.mdc`. Cursor implements this field in its schema. Claude Code does NOT have a `rules` field in its manifest schema — despite the spec claiming Claude Code as a conformant host. This is a direct contradiction: the spec defines an extended type that its "primary conformant host" does not implement. Windsurf has `.windsurfrules` (separate file, not a manifest field). Continue.dev has `rules` in config.yaml but with different semantics.
+
+---
+
+## E-CMP-09 — OIAP (fboldo/oiap) is a real implementation of the same problem space; chose snake_case canonical events
+
+- **claim_id**: E-CMP-09
+- **date**: 2026-06-01
+- **status**: Confirmed
+- **confidence**: High
+- **source.label**: fboldo/oiap — README, ARCHITECTURE.md, MATRIX.md
+- **source.url**: https://github.com/fboldo/oiap
+- **source.type**: Open source project (third party)
+- **notes**: OIAP solves the same "write once, export everywhere" problem as our spec. Key design differences from our approach: (1) OIAP chose snake_case as canonical hook event names (`session_start`, `before_tool`, etc.) and translates to vendor-specific casing at build time — we chose PascalCase following open-plugin-spec. (2) OIAP defines only 8 canonical events (minimal cross-vendor intersection) vs. open-plugin-spec's 25 and our adoption of the full spec set. (3) OIAP defines a capability model (NetworkCapability, DatabaseCapability, etc.) not present in open-plugin-spec or our spec. (4) OIAP uses TypeScript authoring (definePlugin() + hook factories) as its canonical layer rather than a JSON manifest file. (5) OIAP covers 9 platforms including OpenCode, OpenClaw, Antigravity, and Gemini CLI — not covered by open-plugin-spec or our initial research. The existence of OIAP confirms that the "write once, export everywhere" design space is real and being actively built. Our spec's approach of JSON-first with vendorExtensions is complementary (declarative vs. programmatic) rather than competing.

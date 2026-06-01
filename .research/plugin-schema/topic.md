@@ -164,6 +164,12 @@ Uses `extension.toml` (TOML format) in a git repository root. Required fields: `
 | JetBrains AI Assistant | Built-in IDE feature | Uses inherited JetBrains `plugin.xml`; no external extensibility hooks specific to AI features. |
 | Roo Code | **Archived May 15, 2026** | Was a Cline fork; no independent plugin system. Community fork: ZooCode. |
 | Pear AI | Inherits Continue.dev | Electron app using Continue as submodule; no independent plugin system. |
+| Gemini CLI | Extension manifest (unverified) | Google CLI agent, distinct from Gemini Code Assist. OIAP has an exporter for it. Primary docs not verified. |
+| OpenCode | `opencode.json` (unverified) | Python/JavaScript SDK model. OIAP exporter exists. Primary docs not verified. |
+| OpenClaw | `openclaw.plugin.json` (unverified) | Has `package.json` and `index.ts`. OIAP exporter exists. Primary docs not verified. |
+| Antigravity | `.agents/` directory (unverified) | Rules, skills, workflows under `.agents/`. OIAP exporter exists. Primary docs not verified. |
+| Kiro | Future target | Rule/steering focus. No OIAP exporter yet. |
+| Trae | Future target | Rule/steering focus. No OIAP exporter yet. |
 
 ### Published JSON Schemas — all major runtimes
 
@@ -178,6 +184,9 @@ Uses `extension.toml` (TOML format) in a git repository root. Required fields: `
 | Zed (extension.toml) | not published | — | Issue #21994 open; themes schema at https://zed.dev/schema/themes/v0.2.0.json |
 | Continue.dev | https://raw.githubusercontent.com/continuedev/continue/main/extensions/vscode/config_schema.json | JSON Schema Draft 2020-12 | Unstable raw GitHub URL; config, not plugin bundle manifest |
 | Gemini Code Assist | N/A | — | No plugin system |
+| Gemini CLI | not published | — | Extension manifest with embedded MCP config (per OIAP E27); primary docs not verified |
+| OpenCode | not published | — | `opencode.json` manifest (per OIAP E23); primary docs not verified |
+| OpenClaw | not published | — | `openclaw.plugin.json` (per OIAP E23); primary docs not verified |
 | Amazon Q Developer | N/A | — | No plugin system |
 | Cline | not published | — | Docs at https://docs.cline.bot/sdk/plugins; no schema file |
 | Aider | not published | — | Docs only at aider.chat/docs/config.html; no plugin system |
@@ -235,3 +244,6 @@ Every active runtime surveyed supports MCP (Model Context Protocol) server integ
 - [Amazon Q Developer docs](https://docs.aws.amazon.com/amazonq/)
 - [Roo Code archived repository](https://github.com/RooCodeInc/Roo-Code)
 - [Aider configuration docs](https://aider.chat/docs/config.html)
+- [OIAP — fboldo/oiap](https://github.com/fboldo/oiap)
+- [OIAP ARCHITECTURE.md](https://github.com/fboldo/oiap/blob/main/ARCHITECTURE.md)
+- [OIAP MATRIX.md](https://github.com/fboldo/oiap/blob/main/MATRIX.md)

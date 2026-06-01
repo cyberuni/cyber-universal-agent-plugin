@@ -117,6 +117,84 @@
 
 ---
 
+## E22 — OIAP (fboldo/oiap) is an existing multi-platform plugin build system with 9 exporters
+
+- **claim_id**: E22
+- **date**: 2026-06-01
+- **status**: Confirmed
+- **confidence**: High
+- **source.label**: fboldo/oiap GitHub repository (README, ARCHITECTURE.md, MATRIX.md)
+- **source.url**: https://github.com/fboldo/oiap
+- **source.type**: Open source project (third party)
+- **notes**: OIAP (Open Interoperable Agent Plugins) is a TypeScript SDK + CLI that solves the same "write once, export everywhere" problem. v0.3.0 as of May 21, 2026. Three packages: `@oiap/core` (authoring SDK), `@oiap/cli` (build tool), `@oiap/runtime` (generated JS utilities). Nine implemented exporters: Claude Code, Cursor, Codex, Cline, VS Code Copilot Chat, Gemini CLI, OpenClaw, OpenCode, Antigravity. Additional platforms in planning: Factory Droid, Kiro, Trae, Hermes, Aider, Pi. Build: `npx oiap build [file] --target [platform]`. Each export produces native host files + `oiap-bundle.json` + `capability-report.json` + `source-map.json`. MIT licensed.
+
+---
+
+## E23 — OIAP surfaces new runtimes not previously researched
+
+- **claim_id**: E23
+- **date**: 2026-06-01
+- **status**: Confirmed (OIAP as source); Unverified (primary runtime docs)
+- **confidence**: Medium
+- **source.label**: fboldo/oiap ARCHITECTURE.md and MATRIX.md
+- **source.url**: https://github.com/fboldo/oiap
+- **source.type**: Open source project (third party)
+- **notes**: Runtimes surfaced by OIAP not in prior research: **Gemini CLI** (Google's own CLI agent — distinct from Gemini Code Assist IDE extension; uses extension manifest with embedded MCP config), **OpenCode** (`opencode.json` manifest; Python/JavaScript SDK model), **OpenClaw** (`openclaw.plugin.json` with `package.json` and `index.ts`), **Antigravity** (`.agents/` directory structure for rules, skills, workflows), **Kiro** (future; rule/steering focus), **Trae** (future; rule/steering focus), **Hermes** (future; Python/JS SDK host), **Factory Droid** (future). These are in planning or early exporter stage in OIAP; no independent primary source verification attempted yet.
+
+---
+
+## E24 — Codex manifest path discrepancy: OIAP uses `plugin.json`, prior research used `.codex-plugin/plugin.json`
+
+- **claim_id**: E24
+- **date**: 2026-06-01
+- **status**: Needs verification
+- **confidence**: Low
+- **source.label**: fboldo/oiap exporter-codex vs. Codex official docs
+- **source.url**: https://github.com/fboldo/oiap
+- **source.type**: Third-party implementation vs. official docs
+- **notes**: OIAP's exporter-codex generates a manifest at `plugin.json` (root), while prior research (E03) documents the official Codex path as `.codex-plugin/plugin.json`. This discrepancy may indicate: (a) OIAP uses a different/simplified layout, (b) Codex also accepts a root `plugin.json` as a fallback (unconfirmed), or (c) OIAP's exporter is not fully spec-conformant. Needs verification against current Codex official docs before updating E03.
+
+---
+
+## E25 — OIAP defines 8 canonical hook events in snake_case across all platforms
+
+- **claim_id**: E25
+- **date**: 2026-06-01
+- **status**: Confirmed (OIAP internal standard)
+- **confidence**: High
+- **source.label**: fboldo/oiap @oiap/core type system
+- **source.url**: https://github.com/fboldo/oiap
+- **source.type**: Open source project (third party)
+- **notes**: OIAP standardizes on 8 hook events in snake_case as its authoring-level canonical names: `session_start`, `user_prompt_submit`, `before_tool`, `permission_request`, `after_tool`, `before_agent`, `after_agent`, `stop`. The build layer translates these to vendor-specific names/casing. This contrasts with our spec's choice of PascalCase (following open-plugin-spec) and the open-plugin-spec's 25-event list. OIAP's 8 events are a deliberate minimal cross-vendor intersection. Hook result types: AllowHookResult, BlockHookResult, AskHookResult, ModifyHookResult, InjectContextHookResult, ReplaceResultHookResult, ScheduleHookResult, NoopHookResult.
+
+---
+
+## E26 — OIAP defines a formal capability model for plugin permissions
+
+- **claim_id**: E26
+- **date**: 2026-06-01
+- **status**: Confirmed (OIAP internal standard)
+- **confidence**: High
+- **source.label**: fboldo/oiap ARCHITECTURE.md
+- **source.url**: https://github.com/fboldo/oiap
+- **source.type**: Open source project (third party)
+- **notes**: OIAP defines a typed capability negotiation model not present in open-plugin-spec or any vendor manifest: NetworkCapability (host, methods, timeout), DatabaseCapability (driver: postgres/sqlite/mysql/redis, operations), ProcessCapability (command, args, cwd, timeout, exit codes), FilesystemCapability (read/write/delete path arrays), SecretCapability, McpCapability, CustomCapability. Hooks also receive a service context at runtime: fetch, db, exec, mcp, secrets, cache, schedule. Failure modes: fail_closed (default), fail_open, ask_user, use_fallback_rule, log_only. This capability layer is OIAP-specific and not mapped from any vendor's existing manifest format.
+
+---
+
+## E27 — Gemini CLI is distinct from Gemini Code Assist; has its own extension format
+
+- **claim_id**: E27
+- **date**: 2026-06-01
+- **status**: Partially confirmed (OIAP as source; primary docs not fetched)
+- **confidence**: Medium
+- **source.label**: fboldo/oiap exporter-gemini-cli
+- **source.url**: https://github.com/fboldo/oiap
+- **source.type**: Third-party implementation
+- **notes**: OIAP distinguishes Gemini CLI (a CLI-based agent tool, separate from the Gemini Code Assist IDE extension) and implements an exporter for it. The exporter generates an extension manifest with embedded MCP config. Prior research (E16) covered only Gemini Code Assist (closed IDE extension, no plugin system). Gemini CLI may have a different, extensible architecture. Needs primary source verification from Google's Gemini CLI docs.
+
+---
+
 ## E10 — SKILL.md and .mcp.json content is fully portable across vendors
 
 - **claim_id**: E10

@@ -21,3 +21,14 @@
   - **Schema table updated**: Continue.dev schema URL confirmed; only Claude Code and Cursor have stable authoritative schema URLs.
 - **Evidence added**: E13 (Copilot CLI), E14 (Windsurf), E15 (Zed), E16 (Gemini), E17 (Amazon Q/Cody/Tabnine/Supermaven), E18 (Cline), E19 (Continue.dev), E20 (Roo Code/Aider/JetBrains), E21 (MCP convergence).
 - **Triggered by**: User request to extend research to additional runtimes.
+
+## 2026-06-01 — Added OIAP and new runtimes from fboldo/oiap
+
+- **What changed**: Added findings from https://github.com/fboldo/oiap (OIAP v0.3.0). Added evidence entries E22–E27.
+- **Why**: User request to incorporate OIAP's research and findings into existing research.
+- **Conclusion changes**:
+  - Added Gemini CLI, OpenCode, OpenClaw, Antigravity to the schema table and Tier 3 section (unverified from primary sources; sourced from OIAP)
+  - Added Kiro and Trae as planned future targets (not yet researched from primary sources)
+  - Documented Codex manifest path discrepancy (OIAP uses `plugin.json`; our prior research uses `.codex-plugin/plugin.json`) — flagged as needing verification
+- **Evidence added**: E22 (OIAP project overview), E23 (new runtimes), E24 (Codex path discrepancy), E25 (OIAP's 8 snake_case hook events), E26 (OIAP capability model), E27 (Gemini CLI distinction)
+- **Triggered by**: User pointing to https://github.com/fboldo/oiap.

@@ -67,9 +67,22 @@ Everything else — hooks, env vars, rules, lspServers, outputStyles, and all ve
 - A single `hooks.json` that fires correctly on both PascalCase (Claude Code, Codex) and camelCase (Cursor, Copilot CLI) runtimes
 - The spec's `.plugin/plugin.json` path as a confirmed loaded location on Claude Code, Cursor, or Codex
 
+## Notable real-world implementation: OIAP
+
+[fboldo/oiap](https://github.com/fboldo/oiap) (v0.3.0, May 2026) independently implements the same "write once, export everywhere" concept with 9 platform exporters. Key design differences from our spec worth tracking:
+
+- OIAP chose **snake_case** as canonical hook event names (`session_start`, `before_tool`) and translates at build time; our spec chose PascalCase (following open-plugin-spec)
+- OIAP defines only **8 canonical events** (minimal cross-vendor intersection); open-plugin-spec defines 25
+- OIAP uses **TypeScript authoring** (`definePlugin()`) as the canonical layer rather than a JSON manifest
+- OIAP adds a **capability model** (NetworkCapability, DatabaseCapability, ProcessCapability, etc.) not present in open-plugin-spec
+- OIAP targets platforms not in open-plugin-spec: Gemini CLI, OpenCode, OpenClaw, Antigravity
+
+OIAP confirms the design space is real. Its existence is evidence that the "write once, export everywhere" approach is viable, while its architectural choices (TypeScript-first, 8 events, capability model) represent alternative design decisions worth considering for future spec versions.
+
 ## Recheck triggers
 
 - If any vendor publicly confirms loading `.plugin/plugin.json` as a fallback
 - If hook event casing is standardized across vendors
 - If the spec publishes v2.0.0 with changes to the core premises
 - If Claude Code adds `rules` support (currently absent despite spec including it and Cursor implementing it)
+- If OIAP matures and its event/capability model becomes a de-facto standard
