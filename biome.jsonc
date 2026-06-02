@@ -1,0 +1,21 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
+	"extends": ["@repobuddy/biome/recommended"],
+	"files": {
+		"includes": ["!**/bin", "!**/dist", "!**/node_modules", "!.turbo"]
+	},
+	"overrides": [
+		{
+			"includes": ["packages/*/src/**/*.ts", "packages/*/src/**/*.mts"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noConsole": {
+							"level": "off"
+						}
+					}
+				}
+			}
+		}
+	]
+}
