@@ -12,16 +12,17 @@
 		"test": "turbo test",
 		"typecheck": "turbo typecheck",
 		"verify": "turbo verify",
-		"version": "changeset version"
+		"version": "changeset version",
+		"web": "pnpm --filter web"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.15",
-		"@changesets/cli": "^2.29.4",
-		"@commitlint/cli": "^21.0.1",
-		"@commitlint/config-conventional": "^21.0.1",
+		"@biomejs/biome": "^2.4.16",
+		"@changesets/cli": "^2.31.0",
+		"@commitlint/cli": "^21.0.2",
+		"@commitlint/config-conventional": "^21.0.2",
 		"@repobuddy/biome": "^2.3.1",
 		"husky": "^9.1.7",
-		"turbo": "^2.9.14"
+		"turbo": "^2.9.16"
 	},
 	"packageManager": "pnpm@11.0.0",
 	"engines": {
