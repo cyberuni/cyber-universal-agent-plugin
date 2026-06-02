@@ -24,7 +24,7 @@ This system closes that gap: one canonical definition, a structured extension po
 
 1. **Single source of truth.** The canonical definition lives only in `.plugin/plugin.json` — never in vendor-specific locations.
 2. **open-plugin-spec compatible.** The canonical format is the open-plugin-spec extended, never replaced. A `.plugin/plugin.json` that is also a valid open-plugin-spec document remains valid here.
-3. **Vendor-specific by declaration.** Consumers declare which vendors they target and provide vendor-specific fields in a structured extension block — not in separate files.
+3. **Vendor-specific by extension.** Vendors to build for are inferred from `vendorExtensions` keys — no separate target declaration needed. An empty `{}` entry opts into a vendor's output with no vendor-specific fields.
 4. **Lossless build.** The `build` command generates a complete, spec-conformant vendor manifest for each declared vendor. Generated files are treated as build artifacts — never edited by hand.
 5. **Additive, not opinionated.** The system does not dictate plugin content. It only handles the manifest format, transformation rules, and build output. SKILL.md content, hooks logic, and MCP server configuration are the author's concern.
 
@@ -32,7 +32,7 @@ This system closes that gap: one canonical definition, a structured extension po
 
 ## 3. Canonical definition format
 
-The canonical plugin definition extends open-plugin-spec v1.0.0 with two additional top-level fields: `vendors` and `vendorExtensions`.
+The canonical plugin definition extends open-plugin-spec v1.0.0 with one additional top-level field: `vendorExtensions`.
 
 ### 3.1 Schema declaration
 
@@ -71,30 +71,20 @@ Path values accept: `string`, `string[]`, or `{ "paths": ["./..."] }` object per
 
 Env vars in path strings and hook commands use the spec's canonical names: `${PLUGIN_ROOT}` and `${PLUGIN_DATA}`. The build layer translates these to vendor-specific names.
 
-### 3.3 `vendors` field
+### 3.3 `vendorExtensions` field
 
-Declares which vendor manifests the `build` command should generate.
+Declares which vendor manifests the `build` command should generate, and provides vendor-specific fields for each. Each key is a recognized vendor identifier; its presence drives the build output for that vendor. All fields under a vendor key are merged into that vendor's generated manifest during build.
 
-```json
-{
-  "vendors": ["claude-code", "cursor", "codex", "copilot-cli"]
-}
-```
+Recognized vendor identifiers and their output paths:
 
-Valid values:
-
-| Value | Output path | Required manifest fields |
+| Key | Output path | Required manifest fields |
 |---|---|---|
 | `"claude-code"` | `.claude-plugin/plugin.json` | `name` |
 | `"cursor"` | `.cursor-plugin/plugin.json` | `name` |
 | `"codex"` | `.codex-plugin/plugin.json` | `name`, `version`, `description` |
 | `"copilot-cli"` | `plugin.json` (repo root) | `name` |
 
-If `vendors` is absent or empty, `build` is a no-op and emits a warning.
-
-### 3.4 `vendorExtensions` field
-
-Provides vendor-specific fields that have no open-plugin-spec equivalent. Each key is a vendor identifier matching the `vendors` array. All fields under a vendor key are merged into that vendor's generated manifest during build.
+An empty `{}` value opts into that vendor's output with no vendor-specific fields. If `vendorExtensions` is absent or empty, `build` is a no-op and emits a warning.
 
 ```json
 {
@@ -109,7 +99,7 @@ Provides vendor-specific fields that have no open-plugin-spec equivalent. Each k
 
 Fields not recognized by the target vendor's schema are emitted with a build warning and included as-is (pass-through). The author is responsible for using only fields the vendor supports.
 
-#### Recognized vendor extension fields
+#### Vendor-specific fields
 
 **`claude-code`:**
 
@@ -262,7 +252,7 @@ plugin build [--vendor <id>] [--dry-run] [--verbose] [--clean]
 
 | Flag | Description |
 |---|---|
-| *(none)* | Build all vendors declared in `vendors` |
+| *(none)* | Build all vendors declared in `vendorExtensions` |
 | `--vendor <id>` | Build only the named vendor |
 | `--dry-run` | Print what would be written without writing |
 | `--verbose` | Print field-by-field transformation decisions |
@@ -275,14 +265,13 @@ Reads `.plugin/plugin.json` from the current working directory (the plugin root)
 ### 7.3 Validation (pre-build)
 
 1. `name` is present and matches the naming constraint (1–64 chars, `a-z 0-9 - .`, no leading/trailing `-`, no `--` or `..`).
-2. All `vendors` entries are recognized values.
+2. All `vendorExtensions` keys are recognized vendor identifiers (unrecognized keys emit a warning, not an error).
 3. For `codex`: `version` and `description` are present (in canonical or `vendorExtensions.codex`).
 4. All paths declared in component fields start with `./` and do not escape the plugin root with `../`.
-5. `vendorExtensions` keys match entries in `vendors` (extra keys emit a warning, not an error).
 
 ### 7.4 Build steps (per vendor)
 
-For each vendor in `vendors`:
+For each vendor key in `vendorExtensions`:
 
 1. **Start** with the canonical fields (all open-plugin-spec fields from `.plugin/plugin.json`).
 2. **Merge** `vendorExtensions.<vendor>` top-level fields into the manifest (vendor fields win on conflict).
@@ -402,7 +391,6 @@ When committing pre-built manifests for distribution, remove these entries.
   "hooks": "./hooks/hooks.json",
   "lspServers": "./.lsp.json",
   "outputStyles": "./output-styles/",
-  "vendors": ["claude-code", "cursor", "codex", "copilot-cli"],
   "vendorExtensions": {
     "claude-code": {
       "displayName": "My Plugin",
@@ -582,11 +570,11 @@ my-plugin/
 | Extended component fields | `commands`, `agents`, `rules`, `hooks`, `lspServers`, `outputStyles` | same |
 | Env vars | `${PLUGIN_ROOT}`, `${PLUGIN_DATA}` | same (canonical); translated on build |
 | Hook event naming | PascalCase | same (canonical); translated on build |
-| Vendor extensions | not defined | added (`vendors`, `vendorExtensions`) |
+| Vendor extensions | not defined | added (`vendorExtensions`) |
 | Build/transform layer | not defined | added (`plugin build` command) |
 | Vendor manifest generation | not defined | added |
 
-A `.plugin/plugin.json` that omits `vendors` and `vendorExtensions` is a valid open-plugin-spec document and a valid canonical definition (build is a no-op with a warning). The extension is fully additive.
+A `.plugin/plugin.json` that omits `vendorExtensions` is a valid open-plugin-spec document and a valid canonical definition (build is a no-op with a warning). The extension is fully additive.
 
 ---
 
@@ -604,7 +592,7 @@ A `.plugin/plugin.json` that omits `vendors` and `vendorExtensions` is a valid o
 
 6. **Zed support** — Zed uses TOML (`extension.toml`), not JSON, and is a different conceptual model (language/tool extensions, not agent plugin bundles). Zed support would require a separate build target with a fundamentally different output format.
 
-7. **Auto-detect vendors** — A future `plugin build --auto-detect` flag could inspect the directory for existing vendor config dirs and infer the target set.
+7. **Exclude vendors** — A `plugin build --exclude <vendor>` flag could allow opting out of a specific vendor without removing its `vendorExtensions` entry.
 
 8. **Install-time build** — A `plugin install` command that runs `build` after cloning/downloading a plugin, instead of requiring pre-built manifests to be committed.
 
