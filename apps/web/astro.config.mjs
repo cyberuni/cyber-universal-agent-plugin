@@ -3,6 +3,8 @@ import starlight from '@astrojs/starlight'
 import { defineConfig } from 'astro/config'
 
 export default defineConfig({
+	site: 'https://cyberuni.github.io',
+	base: '/cyber-universal-agent-plugin',
 	integrations: [
 		starlight({
 			title: 'uni-plugin',
