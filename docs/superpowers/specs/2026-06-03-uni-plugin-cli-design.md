@@ -98,21 +98,33 @@ Agents and skills reference governance content by name rather than file path. `u
 
 ### Resolution order
 
-Governance resolution follows the same scope system as skills: **enterprise → team → user → local**, where higher authority takes precedence on conflicts. Lower scopes can only add or specialize within the bounds set by higher scopes — they cannot weaken or override a governance defined at a higher scope.
+Governance resolution maps to the scope system each vendor actually implements. Claude Code is the reference vendor with the most complete scope model (verified against official docs).
+
+**Claude Code scope hierarchy (settings.json precedence, highest to lowest):**
+
+| Scope | Path | Notes |
+|---|---|---|
+| Managed | macOS: `/Library/Application Support/ClaudeCode/managed-settings.json`<br>Linux: `/etc/claude-code/managed-settings.json`<br>Windows: `C:\Program Files\ClaudeCode\managed-settings.json` or registry | MDM/org-deployed. Cannot be overridden by lower scopes. Managed-only settings (`allowManagedPermissionRulesOnly`, etc.) have no effect if placed at lower scopes. |
+| Local | `.claude/settings.local.json` | Gitignored. Per-developer overrides within a project. |
+| Project | `.claude/settings.json` | Committed to git. Team-shared project settings. |
+| User | `~/.claude/settings.json` | Lowest. Personal defaults across all projects. |
+
+Note: there is no distinct "team" scope. Team-level settings are delivered either via the **managed** scope (MDM deployment) or via **project**-level files committed to a shared repo.
+
+**Governance resolution order (proposed, modeled on Claude Code):**
 
 | Scope | Path | Authority |
 |---|---|---|
-| Enterprise | vendor/org-managed path (e.g. MDM-deployed) | Highest — cannot be overridden |
-| Team | repo-level or shared team config | Overrides user + local for conflicts |
-| User | `~/.agents/governances/<name>.md` | Overrides local for conflicts |
-| Local (project) | `./governances/<name>.md` | Lowest — project-specific additions only |
+| Managed | OS system path (MDM/org-deployed) | Highest — cannot be overridden |
+| Project | `./governances/<name>.md` | Team-shared (committed to git) |
+| User | `~/.agents/governances/<name>.md` | Personal defaults |
 | Package | `governances/` shipped inside `uni-plugin` npm package | Baseline defaults |
 
-**Conflict rule:** when the same governance name exists at multiple scopes, the highest-authority scope wins. A local project cannot redefine a governance that enterprise has locked.
+**Conflict rule:** when the same governance name exists at multiple scopes, the highest-authority scope wins. A managed governance cannot be redefined by project or user scopes.
 
-**Additive rule:** governances defined only at a lower scope and absent from all higher scopes are loaded normally. Lower scopes extend, not replace.
+**Additive rule:** governances defined only at a lower scope and absent from all higher scopes are loaded normally.
 
-This mirrors the security model of the skills scope system and prevents a local project from weakening enterprise-mandated constraints (e.g. overriding a "never commit secrets" governance).
+**Other vendors:** No other Tier 1 vendor (Cursor, Codex, Copilot CLI) has a documented managed/enterprise scope. Windsurf and Cline have a dual user/project model only. The managed scope is therefore a Claude Code-first feature of the governance system; other vendors fall back to project → user → package resolution.
 
 ### Why governances are not `rules`
 
@@ -195,4 +207,4 @@ vitest, biome, tsdown, tsx, changeset, commitlint, husky, knip (same as `cyber-s
 
 2. **`plugin.json` top-level `governances` field** — whether to add this to the canonical schema is a standards-track question. Not needed for the CLI; `uni-plugin governance` is the consumption-side solution. Propose to open-plugin-spec when the consumption pattern is proven.
 
-3. **Scope path conventions** — the exact filesystem paths for enterprise and team scopes (and whether they are vendor-managed, MDM-deployed, or config-file-declared) need to align with how `cyber-skills` resolves scope paths. Resolve before shipping `governance show`. Enterprise scope path in particular must be write-protected at the OS level to be meaningful as a security boundary.
+3. **Scope path conventions** — the user-scope path (`~/.agents/governances/`) assumes a shared agents config directory. Align with whatever path `cyber-skills` uses before shipping `governance show`. The managed scope path must be write-protected at the OS level to be a meaningful security boundary; the proposed paths mirror Claude Code's managed-settings paths.
