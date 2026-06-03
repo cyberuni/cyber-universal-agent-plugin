@@ -2,6 +2,10 @@
 
 This file provides guidance to AI coding assistants when working with code in this repository.
 
+## Feature Planning
+
+Use GitHub issues for feature planning by default. At the end of a brainstorming or design session, create a GitHub issue (via the `create-issue` skill) to capture the spec. Reference the issue number when resuming work in a future conversation.
+
 ## Commit Discipline
 
 **Auto-commit rule:** When a unit of work is complete and verified, commit it immediately — do not wait for the user to ask. Batching multiple units into one commit, or finishing all work before committing, are both violations of this rule.
