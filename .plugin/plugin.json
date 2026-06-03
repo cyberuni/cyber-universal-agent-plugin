@@ -8,5 +8,14 @@
   "license": "MIT",
   "keywords": ["universal", "plugin", "agent", "cross-vendor"],
   "vendors": ["claude-code", "cursor", "codex", "copilot-cli"],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "vendorExtensions": {
+    "claude-code": {
+      "governances": "./governances/",
+      "assets": "./assets/"
+    },
+    "cursor": {},
+    "codex": {},
+    "copilot-cli": {}
+  }
 }
