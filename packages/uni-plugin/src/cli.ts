@@ -2,12 +2,14 @@
 import { Command } from 'commander'
 
 import { buildCommand } from './build/cli.js'
+import { governanceCommand } from './governance/cli.js'
 
 const program = new Command()
 
 program.name('uni-plugin').description('Universal AI agent plugin build tool').version('0.0.0')
 
 program.addCommand(buildCommand())
+program.addCommand(governanceCommand())
 
 program.parseAsync(process.argv).catch((err: unknown) => {
 	process.stderr.write(`${err instanceof Error ? err.message : String(err)}\n`)
