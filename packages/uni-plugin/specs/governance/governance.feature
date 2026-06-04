@@ -36,9 +36,9 @@ Feature: governance show
     Then the exit code is 1
     And stderr contains 'Governance "missing" not found'
 
-  Scenario: --json returns structured output
+  Scenario: --format json returns structured output
     Given a governance file "test-gov.md" with content "content" exists in "<root>/governances/"
-    When I run "uni-plugin governance show test-gov --json --root <root>"
+    When I run "uni-plugin governance show test-gov --format json --root <root>"
     Then the exit code is 0
     And stdout is valid JSON with scope "project" and content "content"
 
@@ -74,8 +74,8 @@ Feature: governance list
     Then the exit code is 0
     And stdout lists "aaa" before "zzz"
 
-  Scenario: --json returns array of entries
+  Scenario: --format json returns array of entries
     Given a governance file "plugin-design.md" exists in "<root>/governances/"
-    When I run "uni-plugin governance list --json --root <root>"
+    When I run "uni-plugin governance list --format json --root <root>"
     Then the exit code is 0
     And stdout is a JSON array where each entry has "name" and "scope"
