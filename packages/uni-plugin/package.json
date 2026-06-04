@@ -25,7 +25,8 @@
 	},
 	"files": [
 		"bin",
-		"dist"
+		"dist",
+		"governances"
 	],
 	"scripts": {
 		"build": "tsdown",
