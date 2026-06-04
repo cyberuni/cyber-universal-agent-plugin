@@ -1,11 +1,11 @@
 ---
-name: add-spec
-description: Use this skill when adding a domain spec and BDD feature file to uni-plugin for a planned command.
+name: plan-command
+description: Use this skill when planning a new uni-plugin CLI command: spec.md + BDD feature file.
 metadata:
   internal: true
 ---
 
-# Add Domain Spec
+# Plan Command
 
 ## When to use
 
