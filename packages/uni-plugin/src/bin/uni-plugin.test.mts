@@ -56,3 +56,82 @@ test('build --dry-run lists vendors without writing', () => {
 		fs.rmSync(root, { recursive: true, force: true })
 	}
 })
+
+test('governance list returns (none) when no governances exist', () => {
+	const empty = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-plugin-gov-'))
+	try {
+		const result = spawnSync('node', [bin, 'governance', 'list', '--root', empty], {
+			encoding: 'utf8',
+			env: { ...process.env, NODE_NO_WARNINGS: '1' },
+		})
+		expect(result.status).toBe(0)
+		expect(result.stdout).toMatch(/\(none\)/)
+	} finally {
+		fs.rmSync(empty, { recursive: true, force: true })
+	}
+})
+
+test('governance list returns governance name and scope', () => {
+	const root = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-plugin-gov-'))
+	try {
+		fs.mkdirSync(path.join(root, 'governances'))
+		fs.writeFileSync(path.join(root, 'governances', 'plugin-design.md'), '# Plugin Design')
+		const result = spawnSync('node', [bin, 'governance', 'list', '--root', root], {
+			encoding: 'utf8',
+			env: { ...process.env, NODE_NO_WARNINGS: '1' },
+		})
+		expect(result.status).toBe(0)
+		expect(result.stdout).toMatch(/plugin-design/)
+		expect(result.stdout).toMatch(/project/)
+	} finally {
+		fs.rmSync(root, { recursive: true, force: true })
+	}
+})
+
+test('governance show outputs content for a known governance', () => {
+	const root = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-plugin-gov-'))
+	try {
+		fs.mkdirSync(path.join(root, 'governances'))
+		fs.writeFileSync(path.join(root, 'governances', 'plugin-design.md'), '# Plugin Design\ncontent here')
+		const result = spawnSync('node', [bin, 'governance', 'show', 'plugin-design', '--root', root], {
+			encoding: 'utf8',
+			env: { ...process.env, NODE_NO_WARNINGS: '1' },
+		})
+		expect(result.status).toBe(0)
+		expect(result.stdout).toMatch(/# Plugin Design/)
+	} finally {
+		fs.rmSync(root, { recursive: true, force: true })
+	}
+})
+
+test('governance show exits 1 for unknown governance', () => {
+	const empty = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-plugin-gov-'))
+	try {
+		const result = spawnSync('node', [bin, 'governance', 'show', 'missing', '--root', empty], {
+			encoding: 'utf8',
+			env: { ...process.env, NODE_NO_WARNINGS: '1' },
+		})
+		expect(result.status).toBe(1)
+		expect(result.stderr).toMatch(/not found/)
+	} finally {
+		fs.rmSync(empty, { recursive: true, force: true })
+	}
+})
+
+test('governance show --json returns structured output', () => {
+	const root = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-plugin-gov-'))
+	try {
+		fs.mkdirSync(path.join(root, 'governances'))
+		fs.writeFileSync(path.join(root, 'governances', 'test-gov.md'), 'content')
+		const result = spawnSync('node', [bin, 'governance', 'show', 'test-gov', '--json', '--root', root], {
+			encoding: 'utf8',
+			env: { ...process.env, NODE_NO_WARNINGS: '1' },
+		})
+		expect(result.status).toBe(0)
+		const parsed = JSON.parse(result.stdout)
+		expect(parsed.scope).toBe('project')
+		expect(parsed.content).toBe('content')
+	} finally {
+		fs.rmSync(root, { recursive: true, force: true })
+	}
+})
