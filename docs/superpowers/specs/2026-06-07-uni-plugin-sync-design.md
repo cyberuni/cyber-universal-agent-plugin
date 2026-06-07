@@ -1,0 +1,348 @@
+# uni-plugin Cross-Vendor Sync Design
+
+**Date:** 2026-06-07
+**Status:** Approved
+**Relates to:** `packages/uni-plugin/specs/prepare/spec.md`, `packages/uni-plugin/specs/plugin/spec.md`
+
+---
+
+## Problem
+
+When a plugin is installed in one vendor (e.g. Claude Code), it is not automatically available in other vendors (e.g. Cursor, Codex). Each vendor has an isolated plugin cache. The same gap exists for removal and version upgrades. Users must manually repeat actions across every vendor they use.
+
+---
+
+## Five problems in scope
+
+| # | Problem |
+|---|---|
+| P1 | Plugin installed in vendor A → not yet in vendor B |
+| P2 | Plugin removed from vendor A → still present in vendor B |
+| P3 | Plugin at version X in vendor A, version Y in vendor B |
+| P4 | Both global and project scope must be handled |
+| P5 | `uni-plugin` itself is pinned in plugin hooks; bug fixes must be adoptable without requiring plugin authors to act first |
+
+---
+
+## Architecture
+
+Four components:
+
+```
+SessionStart hook (per plugin, per vendor)
+  npx uni-plugin@x.y.z prepare --vendor <id> [--scope global|project]
+        │
+        ▼
+~/.agents/uni-plugin.json  (or .agents/uni-plugin.json for project scope)
+  shared state: snapshots · pending actions · dismissals · update notifications
+        │                           │
+        ▼                           ▼
+uni-plugin CLI / MCP          universal-plugin skill  (/sync)
+  prepare · sync apply          reads pending actions
+  self-update                   presents to user in conversation
+  add · remove · update         calls CLI/MCP to execute
+        │
+        ▼
+Vendor registry
+  bundled config: vendor ID → manifest path · hook glob · CLI commands
+  user-overridable via ~/.agents/uni-plugin-vendors.json
+```
+
+---
+
+## State file
+
+### Locations
+
+| Scope | Path |
+|---|---|
+| Global | `~/.agents/uni-plugin.json` |
+| Project | `<project-root>/.agents/uni-plugin.json` |
+
+Both scopes are processed independently on every `prepare` run.
+
+### Schema
+
+```json
+{
+  "schemaVersion": 1,
+  "snapshots": {
+    "<vendor-id>": {
+      "global": {
+        "takenAt": "<iso8601>",
+        "plugins": {
+          "<plugin-name>": "<version>"
+        }
+      },
+      "project:<absolute-path>": {
+        "takenAt": "<iso8601>",
+        "plugins": {}
+      }
+    }
+  },
+  "dismissed": {
+    "<vendor-id>/<scope>/<plugin-name>": {
+      "version": "<version>",
+      "dismissedAt": "<iso8601>"
+    }
+  },
+  "pendingActions": [
+    {
+      "id": "<uuid>",
+      "type": "install | upgrade | remove",
+      "plugin": "<plugin-name>",
+      "version": "<version>",
+      "fromVendor": "<vendor-id>",
+      "toVendor": "<vendor-id>",
+      "scope": "global | project:<path>",
+      "detectedAt": "<iso8601>"
+    }
+  ],
+  "uniPluginUpdates": {
+    "<major>": {
+      "current": "<version>",
+      "available": "<version>",
+      "detectedAt": "<iso8601>"
+    }
+  }
+}
+```
+
+### Schema stability contract
+
+The state file is shared by all `uni-plugin` major versions simultaneously. To support mixed major versions without coordination:
+
+- Fields are never renamed or removed — only optional fields added
+- Readers skip unknown `type` values in `pendingActions` (do not fail, do not delete)
+- Unknown fields in any record are preserved on write-through
+- `uniPluginUpdates` is keyed by major version string — each major manages its own key independently
+
+`schemaVersion` is informational only. It is not a gate that blocks older readers.
+
+---
+
+## Vendor registry
+
+Bundled JSON config inside the `uni-plugin` package. User override via `~/.agents/uni-plugin-vendors.json` (deep-merged over bundled defaults, allowing new vendors or patched paths).
+
+```json
+{
+  "<vendor-id>": {
+    "sessionStartEvent": "<PascalCase or camelCase event name>",
+    "globalManifest": "<path to installed plugins list>",
+    "projectManifest": "<project-relative path, or null>",
+    "hookGlob": "<glob to find hook files for self-update rewrites>",
+    "globalPluginDir": "<root of installed plugin files>",
+    "installCommand": "<shell template: {name} {marketplace} placeholders>",
+    "removeCommand": "<shell template or null>",
+    "updateCommand": "<shell template or null>"
+  }
+}
+```
+
+**Known vendors (initial):**
+
+| ID | `sessionStartEvent` | CLI available |
+|---|---|---|
+| `claude-code` | `SessionStart` | Yes |
+| `cursor` | `sessionStart` | Partial (research needed) |
+| `codex` | `SessionStart` | Yes |
+| `copilot-cli` | `sessionStart` | Yes |
+
+When `installCommand` / `removeCommand` / `updateCommand` is `null`, the `/sync` skill falls back to manual instructions.
+
+### OCP note
+
+Detecting the current vendor requires vendor-specific knowledge. This violation is intentionally confined to one place: the vendor registry. `uni-plugin`'s core logic is vendor-agnostic; it accepts `--vendor <id>` and looks up config from the registry. Adding a new vendor = adding a registry entry, not a code branch.
+
+---
+
+## `prepare` command
+
+### Signature
+
+```
+uni-plugin prepare --vendor <id> [--scope global|project] [--root <path>]
+                   [--dry-run] [--format text|json]
+```
+
+`--vendor` is required. The SessionStart hook in each vendor's hook file passes it explicitly.
+
+### Flow
+
+```
+1.  Load vendor registry → resolve native manifest path for <vendor-id>
+2.  Read current native manifest
+3.  Load state file
+4.  If no previous snapshot for this vendor + scope:
+      → take snapshot, write state, exit silently  (first-run bootstrap)
+5.  Diff current manifest against previous snapshot
+      added   = present now, absent before
+      removed = present before, absent now
+6.  Update this vendor's snapshot entry in state
+7.  Load all other vendors' snapshots
+8.  For each plugin in added:
+      → other vendors missing it          → generate `install` action (toVendor = other)
+9.  For each plugin in removed:
+      → other vendors still having it     → generate `remove` action (toVendor = other)
+10. For each plugin present in multiple vendors' snapshots at different versions:
+      → generate `upgrade` action toward the vendor with the older version
+      (covers both newly-added plugins and pre-existing version skew)
+11. Filter: drop any action matching a dismissed entry
+12. Deduplicate: skip actions already present in pendingActions
+13. Check npm for uni-plugin updates (at most once per 24h per major version)
+      → if newer same-major found: write/update uniPluginUpdates["<major>"]
+14. Append new actions; write state file
+15. Count new actions added in this run
+      → 0 new actions: exit silently
+      → N > 0: print "N plugin sync action(s) pending. Run /sync to review."
+16. Exit 0
+```
+
+**First-run bootstrap (step 4):** no previous snapshot → treat everything as pre-existing → no actions generated → snapshot taken. Real deltas detected from second run onward.
+
+**Dismissed semantics:** keyed by `<vendor-id>/<scope>/<plugin-name>`. The `version` field records the specific version declined. Dismissing `0.2.0` does not suppress a future offer for `0.3.0`.
+
+**Exit codes:**
+- `0` — completed (with or without pending actions)
+- `1` — vendor not in registry, manifest unreadable, or state file unwritable
+
+**`--dry-run`:** runs steps 1–13 without writing state. Prints what actions would be generated. Exits 0.
+
+### SessionStart hook (generated by `uni-plugin hook register`)
+
+```json
+{
+  "SessionStart": [{
+    "type": "command",
+    "command": "npx uni-plugin@1.2.3 prepare --vendor claude-code --scope global"
+  }]
+}
+```
+
+Event name casing (`SessionStart` vs `sessionStart`) is taken from `sessionStartEvent` in the vendor registry. Silent when clean; one line when actions are pending.
+
+---
+
+## `/sync` skill (`universal-plugin` plugin)
+
+### Plugin structure
+
+```
+universal-plugin/
+  .claude-plugin/plugin.json
+  .cursor-plugin/plugin.json
+  .codex-plugin/plugin.json
+  skills/
+    sync/
+      SKILL.md
+```
+
+### Flow
+
+1. Read pending actions from state file(s) (global + project if in a project)
+2. Read `uniPluginUpdates` entries
+3. If nothing pending: "All vendors are in sync." — done
+4. Present plugin sync actions grouped by type, one group at a time:
+   - `install` group first
+   - `upgrade` group second
+   - `remove` group last (always confirmed individually — removal is destructive)
+5. For each action, user responds:
+
+| Response | Effect |
+|---|---|
+| yes | Call `uni-plugin sync apply --action <id>` → execute; remove from `pendingActions` |
+| no | Remove from `pendingActions`; will reappear on next `prepare` run if still true |
+| don't ask again for this version | Write dismissed entry; remove from `pendingActions` |
+| keep (remove actions only) | Write dismissed entry; remove from `pendingActions`; divergence treated as intentional |
+
+6. After plugin actions: present any `uniPluginUpdates` entries
+7. Report summary
+
+### `uni-plugin sync apply --action <id>`
+
+```
+1. Load action from state file
+2. Look up CLI command for toVendor from vendor registry
+3. If command known:
+     shell out: e.g. cursor plugin install cyber-github@marketplace
+     wait for exit
+     re-read target vendor manifest to confirm plugin presence
+     if confirmed: remove action from pendingActions, update snapshot
+     if not confirmed: report failure, leave action in pendingActions
+4. If command null/unknown:
+     print manual instruction: "Install <plugin>@<version> in <vendor> via its marketplace, then run /sync again."
+     remove action from pendingActions (user takes over)
+5. Write state file
+```
+
+---
+
+## `uni-plugin` self-update
+
+### Detection
+
+Runs inside `prepare` step 13. At most once per 24h per major version (tracked via `uniPluginUpdates["<major>"].detectedAt`). Queries the npm registry for the latest version within the same major. Non-blocking; if the registry is unreachable, skip silently.
+
+### Notification (via `/sync`)
+
+After plugin sync actions are handled:
+
+```
+uni-plugin 1.3.0 is available (you are running 1.2.3).
+Update version pins in all plugin hook files? [yes / no / remind me later]
+```
+
+- **yes** → `uni-plugin self-update --to 1.3.0`
+- **no** → clears `uniPluginUpdates["1"]`; won't reappear until a newer version is detected
+- **remind me later** → leaves entry in state; appears on next `/sync`
+
+### `uni-plugin self-update --to <version>`
+
+```
+1. Parse major from <version>
+2. Load hookGlob for all vendors from vendor registry
+3. Glob all matching hook files
+4. For each file: replace `npx uni-plugin@<same-major>.x.x` with `npx uni-plugin@<version>`
+   (scoped to same major — other major version pins are not touched)
+5. Report: "Updated N hook file(s) across M plugins."
+   If any files with other-major pins were found: "M file(s) with other major version pins were left unchanged."
+6. Clear uniPluginUpdates["<major>"] from state
+```
+
+Both patch and minor version updates require explicit user approval before any file is rewritten.
+
+### Major version available
+
+```
+uni-plugin 2.0.0 is available (you are running 1.2.3).
+This is a major release — plugin authors need to update their pins.
+Check the changelog before upgrading.
+```
+
+No rewrite offered. Clears after user acknowledges.
+
+### Opt-out
+
+```bash
+UNI_PLUGIN_NO_UPDATE=1   # suppresses npm check and notification
+```
+
+Or `"noUpdateCheck": true` in `~/.agents/uni-plugin-vendors.json`.
+
+---
+
+## Scope: what this design does not cover
+
+- Downloading plugins from scratch (requires vendor marketplace API — not available for all vendors)
+- Syncing plugin *settings* or *configuration* across vendors (out of scope)
+- Handling plugin name collisions across marketplaces
+- The authoring-side build/validate/hook-register commands (covered in existing `prepare` and `plugin` domain specs)
+
+---
+
+## Open questions
+
+1. Which vendors expose a CLI command for plugin install/remove/update? Cursor's CLI coverage needs verification before marking as supported.
+2. Should `remove` pending actions have a TTL? A plugin removed from vendor A a long time ago may have been intentionally kept in vendor B; offering removal indefinitely is noisy.
+3. Should project-scope sync be opt-in (require a `.agents/uni-plugin.json` to already exist) rather than auto-created on first `prepare` run?
