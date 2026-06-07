@@ -19,7 +19,8 @@ export function loadRegistry(): VendorRegistry {
   try {
     const override = JSON.parse(fsNode.readFileSync(userOverridePath(), 'utf8')) as VendorRegistry
     return mergeRegistries(bundled, override)
-  } catch {
-    return bundled
+  } catch (err: unknown) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return bundled
+    throw err
   }
 }
