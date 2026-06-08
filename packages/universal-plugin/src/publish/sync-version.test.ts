@@ -78,4 +78,11 @@ describe('syncVersion', () => {
 		const result = syncVersion(dir)
 		expect(result.manifestPath).toBe(path.join(dir, '.plugin', 'plugin.json'))
 	})
+
+	it('overwrites an existing version field', () => {
+		writeManifest({ name: 'my-plugin', version: '0.0.1', packagePath: 'packages/mypkg' })
+		writePackage('packages/mypkg', { version: '1.2.3' })
+		syncVersion(dir)
+		expect(readManifest().version).toBe('1.2.3')
+	})
 })

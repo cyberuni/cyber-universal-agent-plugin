@@ -5,6 +5,7 @@ import { cleanCommand } from './asset-store/cli.js'
 import { buildCommand } from './build/cli.js'
 import { governanceCommand } from './governance/cli.js'
 import { prepareCommand } from './prepare/cli.js'
+import { publishCommand } from './publish/cli.js'
 import { selfUpdateCommand } from './self-update/cli.js'
 import { syncCommand } from './sync/cli.js'
 
@@ -16,6 +17,7 @@ program.addCommand(buildCommand())
 program.addCommand(cleanCommand())
 program.addCommand(governanceCommand())
 program.addCommand(prepareCommand())
+program.addCommand(publishCommand())
 program.addCommand(syncCommand())
 program.addCommand(selfUpdateCommand())
 

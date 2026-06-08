@@ -38,7 +38,7 @@
 		},
 		"packagePath": {
 			"type": "string",
-			"description": "Relative path (from repo root) to the npm package folder whose version this plugin tracks. Used by the 'publish sync-version' command."
+			"description": "Relative path (from repo root) to the npm package folder whose version this plugin tracks."
 		},
 		"keywords": {
 			"type": "array",
