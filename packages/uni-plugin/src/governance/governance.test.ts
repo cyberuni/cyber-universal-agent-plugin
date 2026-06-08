@@ -1,6 +1,8 @@
 import * as os from 'node:os'
 import * as path from 'node:path'
 import { describe, expect, it } from 'vitest'
+import type { StateFile } from '../state/state.js'
+import { emptyState, writeAssetIndex } from '../state/state.js'
 import type { GovernanceFs } from './fs.js'
 import {
 	getManagedDir,
@@ -10,8 +12,6 @@ import {
 	listGovernances,
 	showGovernance,
 } from './governance.js'
-import type { StateFile } from '../state/state.js'
-import { emptyState, writeAssetIndex } from '../state/state.js'
 
 function makeMockFs(files: Record<string, string>): GovernanceFs {
 	return {

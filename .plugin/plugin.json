@@ -1,21 +1,21 @@
 {
-  "$schema": "https://raw.githubusercontent.com/cyberuni/cyber-universal-agent-plugin/refs/heads/main/schema/v1.json",
-  "name": "cyber-universal-agent-plugin",
-  "description": "Research and design toolkit for building universal AI coding agent plugins that work across Claude Code, Cursor, Codex, and GitHub Copilot CLI.",
-  "author": { "name": "unional" },
-  "homepage": "https://github.com/cyberuni/cyber-universal-agent-plugin",
-  "repository": "https://github.com/cyberuni/cyber-universal-agent-plugin",
-  "license": "MIT",
-  "keywords": ["universal", "plugin", "agent", "cross-vendor"],
-  "vendors": ["claude-code", "cursor", "codex", "copilot-cli"],
-  "skills": "./skills/",
-  "vendorExtensions": {
-    "claude-code": {
-      "governances": "./governances/",
-      "assets": "./assets/"
-    },
-    "cursor": {},
-    "codex": {},
-    "copilot-cli": {}
-  }
+	"$schema": "https://raw.githubusercontent.com/cyberuni/cyber-universal-agent-plugin/refs/heads/main/schema/v1.json",
+	"name": "cyber-universal-agent-plugin",
+	"description": "Research and design toolkit for building universal AI coding agent plugins that work across Claude Code, Cursor, Codex, and GitHub Copilot CLI.",
+	"author": { "name": "unional" },
+	"homepage": "https://github.com/cyberuni/cyber-universal-agent-plugin",
+	"repository": "https://github.com/cyberuni/cyber-universal-agent-plugin",
+	"license": "MIT",
+	"keywords": ["universal", "plugin", "agent", "cross-vendor"],
+	"vendors": ["claude-code", "cursor", "codex", "copilot-cli"],
+	"skills": "./skills/",
+	"vendorExtensions": {
+		"claude-code": {
+			"governances": "./governances/",
+			"assets": "./assets/"
+		},
+		"cursor": {},
+		"codex": {},
+		"copilot-cli": {}
+	}
 }

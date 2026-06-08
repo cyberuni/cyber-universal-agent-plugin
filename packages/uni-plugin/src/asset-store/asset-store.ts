@@ -5,13 +5,13 @@ export const ASSET_DIRS = ['governances', 'disciplines', 'guidelines', 'template
 export type AssetDir = (typeof ASSET_DIRS)[number]
 
 export function globalStorePath(): string {
-  return path.join(os.homedir(), '.agents', '.uni-plugin', 'plugins')
+	return path.join(os.homedir(), '.agents', '.uni-plugin', 'plugins')
 }
 
 export function projectStorePath(root: string): string {
-  return path.join(root, '.agents', '.uni-plugin', 'plugins')
+	return path.join(root, '.agents', '.uni-plugin', 'plugins')
 }
 
 export function storeEntryPath(storePath: string, segment: string): string {
-  return path.join(storePath, segment)
+	return path.join(storePath, segment)
 }

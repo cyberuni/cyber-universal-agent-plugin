@@ -1,8 +1,8 @@
 import * as os from 'node:os'
 import * as path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { GovernanceFs } from './fs.js'
 import type { StateFile } from '../state/state.js'
+import type { GovernanceFs } from './fs.js'
 
 export type Scope = 'managed' | 'project' | 'user' | 'package' | 'store'
 
@@ -28,7 +28,8 @@ export interface ShowResult {
 
 export function getManagedDir(): string {
 	if (process.platform === 'darwin') return '/Library/Application Support/UniPlugin/governances'
-	if (process.platform === 'win32') return path.join(process.env['ProgramData'] ?? 'C:\\ProgramData', 'UniPlugin', 'governances')
+	if (process.platform === 'win32')
+		return path.join(process.env['ProgramData'] ?? 'C:\\ProgramData', 'UniPlugin', 'governances')
 	return '/etc/uni-plugin/governances'
 }
 

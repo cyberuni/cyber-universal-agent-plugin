@@ -1,13 +1,13 @@
+import * as fsNode from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import * as fsNode from 'node:fs'
 import { Command, Option } from 'commander'
+import { globalStorePath } from '../asset-store/asset-store.js'
 import { ROOT_OPTION, resolveRoot } from '../cli-options.js'
 import { output, printTable } from '../output.js'
+import { emptyState, mergeSafeState } from '../state/state.js'
 import { realGovernanceFs } from './fs.js'
 import { listGovernances, showGovernance } from './governance.js'
-import { emptyState, mergeSafeState } from '../state/state.js'
-import { globalStorePath } from '../asset-store/asset-store.js'
 
 function readGlobalState() {
 	const p = path.join(os.homedir(), '.agents', 'uni-plugin.json')

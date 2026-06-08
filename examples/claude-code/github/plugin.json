@@ -1,10 +1,10 @@
 {
-  "$schema": "https://raw.githubusercontent.com/cyberuni/cyber-universal-agent-plugin/refs/heads/main/schema/v1.json",
-  "name": "github",
-  "description": "Official GitHub MCP server for repository management. Create issues, manage pull requests, review code, search repositories, and interact with GitHub's full API.",
-  "author": { "name": "GitHub" },
-  "mcpServers": "./.mcp.json",
-  "vendorExtensions": {
-    "claude-code": {}
-  }
+	"$schema": "https://raw.githubusercontent.com/cyberuni/cyber-universal-agent-plugin/refs/heads/main/schema/v1.json",
+	"name": "github",
+	"description": "Official GitHub MCP server for repository management. Create issues, manage pull requests, review code, search repositories, and interact with GitHub's full API.",
+	"author": { "name": "GitHub" },
+	"mcpServers": "./.mcp.json",
+	"vendorExtensions": {
+		"claude-code": {}
+	}
 }
