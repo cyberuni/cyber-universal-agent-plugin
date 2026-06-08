@@ -14,24 +14,24 @@ The recommended architecture has three layers:
 A `skills/prepare/SKILL.md` inside the plugin. Invokable manually in any agent session (`/prepare`). Based on the plugin-portability design — no dependencies, works in any runtime.
 
 **Layer 2 — SessionStart hook + sentinel file (automated, once per plugin version):**
-The plugin's `hooks/hooks.json` contains a `SessionStart`/`sessionStart` hook (both casings, generated per vendor target) that calls `npx uni-plugin@<pinned-version> prepare --sentinel`. A sentinel file at `~/.config/uni-plugin/prepared-<plugin>-<version>` guards against running on every session.
+The plugin's `hooks/hooks.json` contains a `SessionStart`/`sessionStart` hook (both casings, generated per vendor target) that calls `npx universal-plugin@<pinned-version> prepare --sentinel`. A sentinel file at `~/.config/universal-plugin/prepared-<plugin>-<version>` guards against running on every session.
 
-**Layer 3 — `npx uni-plugin` CLI (the sync engine):**
+**Layer 3 — `npx universal-plugin` CLI (the sync engine):**
 A Node CLI (CommonJS/ESM, not Bun) that detects installed vendor runtimes, copies/symlinks artifacts to correct paths, translates hook event casing per vendor, and reports what changed. No `package.json` required in user project.
 
 **Version management:**
-- Plugin author pins `uni-plugin@x.y.z` in hooks.json (explicit, no `@latest`)
-- User approves minor upgrades via `/uni-plugin accept-minor`; stored in `~/.config/uni-plugin/config.json`
-- `uni-plugin` re-execs at approved minor version without rewriting plugin files
+- Plugin author pins `universal-plugin@x.y.z` in hooks.json (explicit, no `@latest`)
+- User approves minor upgrades via `/universal-plugin accept-minor`; stored in `~/.config/universal-plugin/config.json`
+- `universal-plugin` re-execs at approved minor version without rewriting plugin files
 - Major version bump: notify only; author must ship new plugin version
 - Update checks respect `NO_UPDATE_NOTIFIER=1` / `UNI_PLUGIN_NO_UPDATE=1`
 
 **Cleanup:**
-No automatic cleanup on uninstall (no vendor has an uninstall hook). Explicit command: `npx uni-plugin cleanup <plugin-name>`. Sentinel TTL (Option B) provides eventual detection when another plugin's hook fires.
+No automatic cleanup on uninstall (no vendor has an uninstall hook). Explicit command: `npx universal-plugin cleanup <plugin-name>`. Sentinel TTL (Option B) provides eventual detection when another plugin's hook fires.
 
 ## Confidence
 
-**High** that no post-install hook exists on any Tier 1 vendor. **High** that SessionStart + sentinel is the best available automation path. **Medium** that the minor-version re-exec model is safe (depends on strict semver discipline from uni-plugin authors). **Low** on cleanup completeness — the uninstall gap is real and the sentinel TTL approach only works if at least one other uni-plugin-using plugin remains installed.
+**High** that no post-install hook exists on any Tier 1 vendor. **High** that SessionStart + sentinel is the best available automation path. **Medium** that the minor-version re-exec model is safe (depends on strict semver discipline from universal-plugin authors). **Low** on cleanup completeness — the uninstall gap is real and the sentinel TTL approach only works if at least one other universal-plugin-using plugin remains installed.
 
 ## Strongest supporting evidence
 
@@ -55,12 +55,12 @@ No automatic cleanup on uninstall (no vendor has an uninstall hook). Explicit co
 ## Where evidence is thin
 
 - Whether Claude Code revalidates/overwrites plugin cache files if the user edits them (relevant to any approach that rewrites hooks.json in-place)
-- Whether the `uni-plugin` multi-version conflict scenario (multiple plugins, each pinning different `uni-plugin` versions) causes problems in practice
+- Whether the `universal-plugin` multi-version conflict scenario (multiple plugins, each pinning different `universal-plugin` versions) causes problems in practice
 - The full list of distinct problems the prepare mechanism must solve (user noted these are conflated; decomposition pending)
 
 ## Recheck triggers
 
 - If any Tier 1 vendor ships a post-install or post-update hook
 - If Claude Code ships the PostInstall/PostUninstall feature request (issue #11240 or its parent)
-- If `uni-plugin` is implemented and the minor re-exec pattern proves fragile in practice
+- If `universal-plugin` is implemented and the minor re-exec pattern proves fragile in practice
 - After the user decomposes the distinct problems — the design may need to be restructured per problem

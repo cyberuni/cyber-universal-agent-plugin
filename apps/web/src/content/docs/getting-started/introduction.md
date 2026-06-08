@@ -1,9 +1,9 @@
 ---
 title: Introduction
-description: What uni-plugin is and why it exists.
+description: What universal-plugin is and why it exists.
 ---
 
-**uni-plugin** is a build tool for universal AI agent plugins. You write one canonical definition in `.plugin/plugin.json`, and `uni-plugin build` generates a spec-conformant vendor manifest for each runtime you target.
+**universal-plugin** is a build tool for universal AI agent plugins. You write one canonical definition in `.plugin/plugin.json`, and `universal-plugin build` generates a spec-conformant vendor manifest for each runtime you target.
 
 ## The problem
 
@@ -11,7 +11,7 @@ Every major AI coding agent runtime — Claude Code, Cursor, Codex, GitHub Copil
 
 ## The solution
 
-A single source of truth in `.plugin/plugin.json` following the [open-plugin-spec](https://github.com/vercel-labs/open-plugin-spec), extended with a `vendorExtensions` field for vendor-specific additions. Running `uni-plugin build` produces each vendor's manifest as a build artifact.
+A single source of truth in `.plugin/plugin.json` following the [open-plugin-spec](https://github.com/vercel-labs/open-plugin-spec), extended with a `vendorExtensions` field for vendor-specific additions. Running `universal-plugin build` produces each vendor's manifest as a build artifact.
 
 ```json
 {
@@ -28,7 +28,7 @@ A single source of truth in `.plugin/plugin.json` following the [open-plugin-spe
 }
 ```
 
-Running `uni-plugin build` from the plugin root generates:
+Running `universal-plugin build` from the plugin root generates:
 
 | Vendor | Output |
 |---|---|
@@ -46,4 +46,4 @@ Running `uni-plugin build` from the plugin root generates:
 
 ## Generated files are build artifacts
 
-The generated vendor manifests should be treated like compiled output — either gitignored (build on install) or committed (pre-built for distribution). The choice is yours; `uni-plugin` enforces neither.
+The generated vendor manifests should be treated like compiled output — either gitignored (build on install) or committed (pre-built for distribution). The choice is yours; `universal-plugin` enforces neither.

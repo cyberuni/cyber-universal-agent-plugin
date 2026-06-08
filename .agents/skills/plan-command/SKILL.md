@@ -1,6 +1,6 @@
 ---
 name: plan-command
-description: Use this skill when planning a new uni-plugin CLI command - spec.md + BDD feature file.
+description: Use this skill when planning a new universal-plugin CLI command - spec.md + BDD feature file.
 metadata:
   internal: true
 ---
@@ -9,7 +9,7 @@ metadata:
 
 ## When to use
 
-A new domain is being added to `uni-plugin` and needs:
+A new domain is being added to `universal-plugin` and needs:
 - `specs/<domain>/spec.md` — narrative spec
 - `specs/<domain>/<domain>.feature` — Gherkin scenarios
 
@@ -29,10 +29,10 @@ These are the canonical patterns. Do not deviate without cause.
 
 Run:
 ```bash
-uni-plugin governance show cli-command
+universal-plugin governance show cli-command
 ```
 
-If it returns nothing, read `packages/uni-plugin/governances/cli-command.md` directly.
+If it returns nothing, read `packages/universal-plugin/governances/cli-command.md` directly.
 
 Key rules to carry into the spec:
 - Output flag is `--format <format>` (values: `text`, `json`, `agent`). `--json` is a hidden alias only — never document it as a primary flag.
@@ -49,7 +49,7 @@ Use this structure exactly:
 # <Domain> Domain Spec
 
 **Status:** Planned
-**Commands:** `uni-plugin <command> [options]`
+**Commands:** `universal-plugin <command> [options]`
 **Governance:** [cli-command](../../governances/cli-command.md)
 
 ---
@@ -79,7 +79,7 @@ Use this structure exactly:
 ## Command surface
 
 \`\`\`
-uni-plugin <command> [options]
+universal-plugin <command> [options]
 \`\`\`
 
 **Exit codes:**
@@ -93,7 +93,7 @@ Rules:
 - `Status` is `Planned` until implemented.
 - Each design decision is a named subsection. One decision per subsection.
 - The command surface block lists the full flag set, referencing only CAN options that apply.
-- If the domain has subcommands, add a `### uni-plugin <sub>` heading per subcommand inside the command surface section.
+- If the domain has subcommands, add a `### universal-plugin <sub>` heading per subcommand inside the command surface section.
 
 ### 4. Write `specs/<domain>/<domain>.feature`
 
@@ -107,7 +107,7 @@ Feature: <verb> <noun>
 
   Scenario: <happy path name>
     Given <setup>
-    When I run "uni-plugin <command> [flags] --root <root>"
+    When I run "universal-plugin <command> [flags] --root <root>"
     Then the exit code is 0
     And <observable output assertion>
 
@@ -147,7 +147,7 @@ And stderr contains "<fragment>"
 
 ### 5. Update main spec.md domain index
 
-Add a line to the `## Domain index` section in `packages/uni-plugin/specs/spec.md`:
+Add a line to the `## Domain index` section in `packages/universal-plugin/specs/spec.md`:
 
 ```markdown
 - [<domain>](./<domain>/spec.md) — <one-line description matching the What section>

@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-07
 **Status:** Approved
-**Relates to:** `docs/superpowers/specs/2026-06-07-uni-plugin-sync-design.md`, GitHub Discussion #6
+**Relates to:** `docs/superpowers/specs/2026-06-07-universal-plugin-sync-design.md`, GitHub Discussion #6
 
 ---
 
@@ -11,7 +11,7 @@
 Skills, commands, and agent instructions need to load named assets (governances, disciplines, guidelines, templates) from plugins by name. Today there is no vendor-neutral way to do this:
 
 - Each vendor installs plugins to its own isolated cache (`~/.claude/plugins/`, `~/.cursor/extensions/`, etc.)
-- A subprocess like `npx uni-plugin governance show` has no reliable way to detect which vendor invoked it — only Claude Code and Codex set detectable env vars; Cursor and Copilot CLI document nothing
+- A subprocess like `npx universal-plugin governance show` has no reliable way to detect which vendor invoked it — only Claude Code and Codex set detectable env vars; Cursor and Copilot CLI document nothing
 - Even with vendor detection, vendor caches may not expose raw plugin files (sandboxing, encryption, proprietary formats)
 - Flat governance names (`governance show plugin-design`) will collide as unrelated plugins ship same-named assets
 
@@ -21,28 +21,28 @@ Skills, commands, and agent instructions need to load named assets (governances,
 
 ### Plugin asset store
 
-`uni-plugin` owns a vendor-neutral, versioned flat store modelled on pnpm's content store:
+`universal-plugin` owns a vendor-neutral, versioned flat store modelled on pnpm's content store:
 
 ```
-~/.agents/.uni-plugin/plugins/          ← global scope
+~/.agents/.universal-plugin/plugins/          ← global scope
   npm/
-    uni-plugin@1.2.3/
+    universal-plugin@1.2.3/
       governances/
       disciplines/
       guidelines/
       templates/
-    @cyberuni/uni-plugin@1.2.3/
+    @cyberuni/universal-plugin@1.2.3/
   github.com/
-    cyberuni/uni-plugin@1.2.3/
+    cyberuni/universal-plugin@1.2.3/
       governances/
   gitlab.com/
     org/repo@1.2.3/
   github.mycompany.com/                 ← registered custom instance
     org/repo@1.2.3/
   url/
-    uni-plugin-a3f9b2c1@1.2.3/         ← unrecognized hosts: <name>-<sha8>@<version>
+    universal-plugin-a3f9b2c1@1.2.3/         ← unrecognized hosts: <name>-<sha8>@<version>
 
-.agents/.uni-plugin/plugins/            ← project scope (repo-relative)
+.agents/.universal-plugin/plugins/            ← project scope (repo-relative)
 ```
 
 Paths inside the store are relative (`~` for global, repo-root for project). Store entries are immutable per version — `prepare` skips population if `<source>/<plugin>@<version>/` already exists.
@@ -77,7 +77,7 @@ Three tiers, matching the governance namespace RFC (Discussion #6):
 Source types are registered, not hardcoded. Built-in defaults:
 
 ```json
-// ~/.agents/.uni-plugin/sources.json
+// ~/.agents/.universal-plugin/sources.json
 {
   "handlers": {
     "github": { "hosts": ["github.com"] },
@@ -102,20 +102,20 @@ Handler type determines fetch protocol only. Store path always uses the actual h
 
 ### State JSON additions
 
-Two new top-level keys in `~/.agents/uni-plugin.json`:
+Two new top-level keys in `~/.agents/universal-plugin.json`:
 
 ```json
 {
   "plugins": {
     "claude-code": {
-      "uni-plugin": { "source": "npm", "path": "~/.claude/plugins/uni-plugin", "version": "1.2.3" }
+      "universal-plugin": { "source": "npm", "path": "~/.claude/plugins/universal-plugin", "version": "1.2.3" }
     },
     "cursor": {
-      "uni-plugin": { "source": "npm", "path": "~/.cursor/extensions/uni-plugin", "version": "1.2.3" }
+      "universal-plugin": { "source": "npm", "path": "~/.cursor/extensions/universal-plugin", "version": "1.2.3" }
     }
   },
   "assets": {
-    "uni-plugin": { "source": "npm", "version": "1.2.3" }
+    "universal-plugin": { "source": "npm", "version": "1.2.3" }
   }
 }
 ```
@@ -123,7 +123,7 @@ Two new top-level keys in `~/.agents/uni-plugin.json`:
 - `plugins.<vendor>` — vendor-keyed index, written by `prepare` for the current vendor on each run. Records source, vendor cache path, and version. Used by sync.
 - `assets.<plugin-name>` — vendor-neutral index, written by `prepare`. Points to which store entry to use for ambient resolution. Last-write wins across vendors; sync keeps versions converging so divergence is transient.
 
-Project scope uses the same structure in `.agents/uni-plugin.json` with repo-relative paths.
+Project scope uses the same structure in `.agents/universal-plugin.json` with repo-relative paths.
 
 ### `prepare` changes
 
@@ -157,7 +157,7 @@ For `governance show plugin-name/asset-name`:
 2. Check project scope: `<root>/governances/plugin-name/asset-name.md`
 3. Check user scope: `~/.agents/governances/plugin-name/asset-name.md`
 4. Look up `assets.plugin-name` in state JSON → get `{ source, version }`
-5. Resolve store path: `~/.agents/.uni-plugin/plugins/<source>/<plugin>@<version>/governances/asset-name.md`
+5. Resolve store path: `~/.agents/.universal-plugin/plugins/<source>/<plugin>@<version>/governances/asset-name.md`
 
 For source-pinned `npm:plugin-name/asset-name`: skip steps 1–3, go directly to step 5 using the specified source. Cannot be shadowed by scope files.
 
@@ -170,12 +170,12 @@ Flat names without `/` (e.g. `plugin-design`) remain backward compatible — res
 Removes asset store contents. Modelled after `pnpm clean`.
 
 ```
-uni-plugin clean [--state] [--scope global|project]
+universal-plugin clean [--state] [--scope global|project]
 ```
 
 | Flag | Effect |
 |---|---|
-| _(none)_ | Remove asset store: `~/.agents/.uni-plugin/plugins/` (global) or `.agents/.uni-plugin/plugins/` (project) |
+| _(none)_ | Remove asset store: `~/.agents/.universal-plugin/plugins/` (global) or `.agents/.universal-plugin/plugins/` (project) |
 | `--state` | Also clear `plugins` and `assets` keys from state JSON |
 | `--scope global` | Global store only (default) |
 | `--scope project` | Project store only |
@@ -188,7 +188,7 @@ After `clean`, the next `prepare` run repopulates the store from vendor cache or
 
 1. Discipline and guideline asset types — are they distinct from governance in loading semantics, or just different naming conventions? Details still in flux; document in `apps/web` once settled.
 2. Authentication for source handlers — how are credentials passed when fetching from private GitHub/GitLab instances or private npm registries? Env vars + credential helper pattern deferred to a follow-on RFC.
-3. Store garbage collection — versions accumulate as plugins update. When and how are old versions pruned? `uni-plugin clean` removes everything; a future `uni-plugin store prune` could remove only unreferenced versions.
+3. Store garbage collection — versions accumulate as plugins update. When and how are old versions pruned? `universal-plugin clean` removes everything; a future `universal-plugin store prune` could remove only unreferenced versions.
 4. Windows MAX_PATH — `longPathsEnabled` in app manifest recommended. Document as a Windows requirement.
 5. Custom asset paths — should `plugin.json` support declaring non-standard asset directories (e.g. `"governances": "custom-gov-dir/"`)? Currently convention-only (`governances/`, `disciplines/`, etc.). If supported, `prepare` would need to read the declaration during store population.
 

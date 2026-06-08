@@ -1,6 +1,6 @@
 # CLI Command Conventions
 
-Governance for `uni-plugin` CLI command design. Defines which conventions are required (MUST) and which are available to apply where appropriate (CAN).
+Governance for `universal-plugin` CLI command design. Defines which conventions are required (MUST) and which are available to apply where appropriate (CAN).
 
 ---
 

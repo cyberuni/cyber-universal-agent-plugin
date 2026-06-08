@@ -7,7 +7,7 @@ export default defineConfig({
 	base: '/cyber-universal-agent-plugin',
 	integrations: [
 		starlight({
-			title: 'uni-plugin',
+			title: 'universal-plugin',
 			description:
 				'Universal AI agent plugin build tool — write once, build for Claude Code, Cursor, Codex, and Copilot CLI.',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/cyberuni/cyber-universal-agent-plugin' }],

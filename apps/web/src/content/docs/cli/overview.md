@@ -1,9 +1,9 @@
 ---
 title: CLI Overview
-description: The uni-plugin CLI — commands and output formats.
+description: The universal-plugin CLI — commands and output formats.
 ---
 
-The `uni-plugin` CLI transforms a canonical `.plugin/plugin.json` into vendor-specific manifests.
+The `universal-plugin` CLI transforms a canonical `.plugin/plugin.json` into vendor-specific manifests.
 
 ## Invocation
 
@@ -11,10 +11,10 @@ Always pin to an exact version in hooks and CI:
 
 ```bash
 # One-off
-npx uni-plugin@latest --help
+npx universal-plugin@latest --help
 
 # Scripting (pin)
-npx uni-plugin@$(npm view uni-plugin version) <command>
+npx universal-plugin@$(npm view universal-plugin version) <command>
 ```
 
 ## Commands

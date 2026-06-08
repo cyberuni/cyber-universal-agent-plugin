@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Implement a vendor-neutral asset store (`~/.agents/.uni-plugin/plugins/`) so `governance show plugin-name/asset-name` resolves plugin assets without vendor-specific path knowledge or process detection.
+**Goal:** Implement a vendor-neutral asset store (`~/.agents/.universal-plugin/plugins/`) so `governance show plugin-name/asset-name` resolves plugin assets without vendor-specific path knowledge or process detection.
 
 **Architecture:** `prepare` discovers installed plugins via the vendor registry, writes a plugin index (`plugins`/`assets` keys) to the state JSON, and copies asset directories into a versioned flat store. `governance show` parses namespaced names, looks up the plugin in the `assets` index, and resolves from the store. A new `clean` command removes the store.
 
@@ -25,7 +25,7 @@
 | `src/asset-store/asset-store.ts` | Create | Store root paths, entry path, asset type dirs |
 | `src/asset-store/asset-store.test.ts` | Create | Tests for store path helpers |
 | `src/asset-store/fs.ts` | Create | Populate store from vendor cache, clean store |
-| `src/asset-store/cli.ts` | Create | `uni-plugin clean` command |
+| `src/asset-store/cli.ts` | Create | `universal-plugin clean` command |
 | `src/prepare/fs.ts` | Modify | Add `readPluginRoots()` to `PrepareFs` |
 | `src/prepare/prepare.ts` | Modify | Write plugin index + trigger store population |
 | `src/prepare/prepare.test.ts` | Modify | Add tests for index writing and store population |
@@ -56,7 +56,7 @@ it('claudeCode fixture has pluginRootSuffix', () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run vendor-registry
+cd packages/universal-plugin && pnpm test --run vendor-registry
 ```
 
 Expected: FAIL — property `pluginRootSuffix` does not exist on type `VendorConfig`
@@ -151,7 +151,7 @@ const claudeCode: VendorConfig = {
 - [ ] **Step 6: Run tests and verify they pass**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run vendor-registry
+cd packages/universal-plugin && pnpm test --run vendor-registry
 ```
 
 Expected: all tests PASS
@@ -159,9 +159,9 @@ Expected: all tests PASS
 - [ ] **Step 7: Commit**
 
 ```bash
-git add packages/uni-plugin/src/vendor-registry/vendor-registry.ts \
-        packages/uni-plugin/src/vendor-registry/data/vendors.json \
-        packages/uni-plugin/src/vendor-registry/vendor-registry.test.ts
+git add packages/universal-plugin/src/vendor-registry/vendor-registry.ts \
+        packages/universal-plugin/src/vendor-registry/data/vendors.json \
+        packages/universal-plugin/src/vendor-registry/vendor-registry.test.ts
 git commit -m "feat(vendor-registry): add pluginRootSuffix field"
 ```
 
@@ -189,40 +189,40 @@ describe('emptyState plugins and assets', () => {
 describe('writePluginIndex', () => {
   it('sets plugin entry for vendor and plugin name', () => {
     const s = emptyState()
-    const updated = writePluginIndex(s, 'claude-code', 'uni-plugin', {
+    const updated = writePluginIndex(s, 'claude-code', 'universal-plugin', {
       source: 'npm',
-      path: '~/.claude/plugins/uni-plugin',
+      path: '~/.claude/plugins/universal-plugin',
       version: '1.2.3',
     })
-    expect(updated.plugins['claude-code']!['uni-plugin']).toEqual({
+    expect(updated.plugins['claude-code']!['universal-plugin']).toEqual({
       source: 'npm',
-      path: '~/.claude/plugins/uni-plugin',
+      path: '~/.claude/plugins/universal-plugin',
       version: '1.2.3',
     })
   })
 
   it('does not mutate other vendor entries', () => {
     let s = emptyState()
-    s = writePluginIndex(s, 'claude-code', 'uni-plugin', {
+    s = writePluginIndex(s, 'claude-code', 'universal-plugin', {
       source: 'npm',
-      path: '~/.claude/plugins/uni-plugin',
+      path: '~/.claude/plugins/universal-plugin',
       version: '1.2.3',
     })
-    s = writePluginIndex(s, 'cursor', 'uni-plugin', {
+    s = writePluginIndex(s, 'cursor', 'universal-plugin', {
       source: 'npm',
-      path: '~/.cursor/extensions/uni-plugin',
+      path: '~/.cursor/extensions/universal-plugin',
       version: '1.2.3',
     })
-    expect(s.plugins['claude-code']!['uni-plugin']!.path).toBe('~/.claude/plugins/uni-plugin')
-    expect(s.plugins['cursor']!['uni-plugin']!.path).toBe('~/.cursor/extensions/uni-plugin')
+    expect(s.plugins['claude-code']!['universal-plugin']!.path).toBe('~/.claude/plugins/universal-plugin')
+    expect(s.plugins['cursor']!['universal-plugin']!.path).toBe('~/.cursor/extensions/universal-plugin')
   })
 })
 
 describe('writeAssetIndex', () => {
   it('sets asset entry for plugin name', () => {
     const s = emptyState()
-    const updated = writeAssetIndex(s, 'uni-plugin', { source: 'npm', version: '1.2.3' })
-    expect(updated.assets['uni-plugin']).toEqual({ source: 'npm', version: '1.2.3' })
+    const updated = writeAssetIndex(s, 'universal-plugin', { source: 'npm', version: '1.2.3' })
+    expect(updated.assets['universal-plugin']).toEqual({ source: 'npm', version: '1.2.3' })
   })
 })
 ```
@@ -232,7 +232,7 @@ Also add `writePluginIndex` and `writeAssetIndex` to the import line at the top 
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run state
+cd packages/universal-plugin && pnpm test --run state
 ```
 
 Expected: FAIL — `writePluginIndex` and `writeAssetIndex` not exported
@@ -322,7 +322,7 @@ export function mergeSafeState(raw: StateFile): StateFile {
 - [ ] **Step 4: Run tests and verify they pass**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run state
+cd packages/universal-plugin && pnpm test --run state
 ```
 
 Expected: all tests PASS
@@ -330,8 +330,8 @@ Expected: all tests PASS
 - [ ] **Step 5: Commit**
 
 ```bash
-git add packages/uni-plugin/src/state/state.ts \
-        packages/uni-plugin/src/state/state.test.ts
+git add packages/universal-plugin/src/state/state.ts \
+        packages/universal-plugin/src/state/state.test.ts
 git commit -m "feat(state): add plugins and assets index to state schema"
 ```
 
@@ -400,28 +400,28 @@ describe('resolveSourceType', () => {
 
 describe('getStoreSegment', () => {
   it('npm unscoped: npm/plugin-name@version', () => {
-    expect(getStoreSegment('npm', 'uni-plugin', '1.2.3', defaultSources)).toBe(
-      'npm/uni-plugin@1.2.3',
+    expect(getStoreSegment('npm', 'universal-plugin', '1.2.3', defaultSources)).toBe(
+      'npm/universal-plugin@1.2.3',
     )
   })
 
   it('npm scoped: npm/@scope/name@version', () => {
-    expect(getStoreSegment('npm', '@cyberuni/uni-plugin', '1.2.3', defaultSources)).toBe(
-      'npm/@cyberuni/uni-plugin@1.2.3',
+    expect(getStoreSegment('npm', '@cyberuni/universal-plugin', '1.2.3', defaultSources)).toBe(
+      'npm/@cyberuni/universal-plugin@1.2.3',
     )
   })
 
   it('github: github.com/owner/repo@version', () => {
-    expect(getStoreSegment('github.com/cyberuni/uni-plugin', 'uni-plugin', '1.2.3', defaultSources)).toBe(
-      'github.com/cyberuni/uni-plugin@1.2.3',
+    expect(getStoreSegment('github.com/cyberuni/universal-plugin', 'universal-plugin', '1.2.3', defaultSources)).toBe(
+      'github.com/cyberuni/universal-plugin@1.2.3',
     )
   })
 
   it('url: url/name-sha8@version for unrecognized host', () => {
     const url = 'https://example.com/org/repo'
     const hash = sha8(url)
-    expect(getStoreSegment(url, 'uni-plugin', '1.2.3', defaultSources)).toBe(
-      `url/uni-plugin-${hash}@1.2.3`,
+    expect(getStoreSegment(url, 'universal-plugin', '1.2.3', defaultSources)).toBe(
+      `url/universal-plugin-${hash}@1.2.3`,
     )
   })
 })
@@ -430,7 +430,7 @@ describe('getStoreSegment', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run source-registry
+cd packages/universal-plugin && pnpm test --run source-registry
 ```
 
 Expected: FAIL — module not found
@@ -528,7 +528,7 @@ import { DEFAULT_SOURCES } from './source-registry.js'
 import type { SourcesConfig } from './source-registry.js'
 
 function sourcesConfigPath(): string {
-  return path.join(os.homedir(), '.agents', '.uni-plugin', 'sources.json')
+  return path.join(os.homedir(), '.agents', '.universal-plugin', 'sources.json')
 }
 
 export function loadSourcesConfig(): SourcesConfig {
@@ -544,7 +544,7 @@ export function loadSourcesConfig(): SourcesConfig {
 - [ ] **Step 5: Run tests and verify they pass**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run source-registry
+cd packages/universal-plugin && pnpm test --run source-registry
 ```
 
 Expected: all tests PASS
@@ -552,7 +552,7 @@ Expected: all tests PASS
 - [ ] **Step 6: Commit**
 
 ```bash
-git add packages/uni-plugin/src/source-registry/
+git add packages/universal-plugin/src/source-registry/
 git commit -m "feat(source-registry): add store path derivation and source type detection"
 ```
 
@@ -581,25 +581,25 @@ import {
 } from './asset-store.js'
 
 describe('globalStorePath', () => {
-  it('returns ~/.agents/.uni-plugin/plugins/', () => {
+  it('returns ~/.agents/.universal-plugin/plugins/', () => {
     expect(globalStorePath()).toBe(
-      path.join(os.homedir(), '.agents', '.uni-plugin', 'plugins'),
+      path.join(os.homedir(), '.agents', '.universal-plugin', 'plugins'),
     )
   })
 })
 
 describe('projectStorePath', () => {
-  it('returns <root>/.agents/.uni-plugin/plugins/', () => {
+  it('returns <root>/.agents/.universal-plugin/plugins/', () => {
     expect(projectStorePath('/my/project')).toBe(
-      '/my/project/.agents/.uni-plugin/plugins',
+      '/my/project/.agents/.universal-plugin/plugins',
     )
   })
 })
 
 describe('storeEntryPath', () => {
   it('joins store root with segment', () => {
-    expect(storeEntryPath('/store', 'npm/uni-plugin@1.2.3')).toBe(
-      '/store/npm/uni-plugin@1.2.3',
+    expect(storeEntryPath('/store', 'npm/universal-plugin@1.2.3')).toBe(
+      '/store/npm/universal-plugin@1.2.3',
     )
   })
 })
@@ -617,7 +617,7 @@ describe('ASSET_DIRS', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run asset-store
+cd packages/universal-plugin && pnpm test --run asset-store
 ```
 
 Expected: FAIL — module not found
@@ -632,11 +632,11 @@ export const ASSET_DIRS = ['governances', 'disciplines', 'guidelines', 'template
 export type AssetDir = (typeof ASSET_DIRS)[number]
 
 export function globalStorePath(): string {
-  return path.join(os.homedir(), '.agents', '.uni-plugin', 'plugins')
+  return path.join(os.homedir(), '.agents', '.universal-plugin', 'plugins')
 }
 
 export function projectStorePath(root: string): string {
-  return path.join(root, '.agents', '.uni-plugin', 'plugins')
+  return path.join(root, '.agents', '.universal-plugin', 'plugins')
 }
 
 export function storeEntryPath(storePath: string, segment: string): string {
@@ -675,7 +675,7 @@ export function removeStore(storePath: string): void {
 - [ ] **Step 5: Run tests and verify they pass**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run asset-store
+cd packages/universal-plugin && pnpm test --run asset-store
 ```
 
 Expected: all tests PASS
@@ -683,7 +683,7 @@ Expected: all tests PASS
 - [ ] **Step 6: Commit**
 
 ```bash
-git add packages/uni-plugin/src/asset-store/
+git add packages/universal-plugin/src/asset-store/
 git commit -m "feat(asset-store): add store path helpers and fs operations"
 ```
 
@@ -706,10 +706,10 @@ import { writePluginIndex, writeAssetIndex } from '../state/state.js'
 // Add new describe block:
 describe('runPrepare plugin index', () => {
   it('writes plugin entry to state when plugin roots are provided', () => {
-    const pluginRoots = { 'uni-plugin': '/home/user/.claude/plugins/uni-plugin' }
+    const pluginRoots = { 'universal-plugin': '/home/user/.claude/plugins/universal-plugin' }
     const capturedStates: StateFile[] = []
     const fs: PrepareFs = {
-      readManifest: () => ({ 'uni-plugin': '1.2.3' }),
+      readManifest: () => ({ 'universal-plugin': '1.2.3' }),
       readPluginRoots: () => pluginRoots,
       readGlobalState: () => emptyState(),
       readProjectState: () => null,
@@ -717,10 +717,10 @@ describe('runPrepare plugin index', () => {
       writeProjectState: () => {},
     }
     runPrepare({ vendorId: 'claude-code', scope: 'global', fs, now: '2026-01-01T00:00:00Z' })
-    expect(capturedStates[0]!.plugins['claude-code']!['uni-plugin']).toMatchObject({
+    expect(capturedStates[0]!.plugins['claude-code']!['universal-plugin']).toMatchObject({
       version: '1.2.3',
     })
-    expect(capturedStates[0]!.assets['uni-plugin']).toMatchObject({ version: '1.2.3' })
+    expect(capturedStates[0]!.assets['universal-plugin']).toMatchObject({ version: '1.2.3' })
   })
 })
 ```
@@ -728,7 +728,7 @@ describe('runPrepare plugin index', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run prepare
+cd packages/universal-plugin && pnpm test --run prepare
 ```
 
 Expected: FAIL — `readPluginRoots` does not exist on `PrepareFs`
@@ -820,7 +820,7 @@ to each one.
 - [ ] **Step 6: Run tests and verify they pass**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run prepare
+cd packages/universal-plugin && pnpm test --run prepare
 ```
 
 Expected: all tests PASS
@@ -868,7 +868,7 @@ populateStoreFromVendorCache(prepareFs.readPluginRoots(), prepareFs.readManifest
 - [ ] **Step 9: Run full test suite**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run
+cd packages/universal-plugin && pnpm test --run
 ```
 
 Expected: all tests PASS
@@ -876,10 +876,10 @@ Expected: all tests PASS
 - [ ] **Step 10: Commit**
 
 ```bash
-git add packages/uni-plugin/src/prepare/fs.ts \
-        packages/uni-plugin/src/prepare/prepare.ts \
-        packages/uni-plugin/src/prepare/prepare.test.ts \
-        packages/uni-plugin/src/prepare/cli.ts
+git add packages/universal-plugin/src/prepare/fs.ts \
+        packages/universal-plugin/src/prepare/prepare.ts \
+        packages/universal-plugin/src/prepare/prepare.test.ts \
+        packages/universal-plugin/src/prepare/cli.ts
 git commit -m "feat(prepare): write plugin index and populate asset store"
 ```
 
@@ -907,12 +907,12 @@ function stateWithPlugin(pluginName: string, storePath: string): StateFile {
 
 describe('showGovernance — namespaced name', () => {
   it('resolves plugin-name/governance-name from asset store', () => {
-    const state = stateWithPlugin('uni-plugin', '/store')
+    const state = stateWithPlugin('universal-plugin', '/store')
     const storePath = '/store'
-    const entryPath = '/store/npm/uni-plugin@1.2.3/governances/plugin-design.md'
+    const entryPath = '/store/npm/universal-plugin@1.2.3/governances/plugin-design.md'
     const govFs = makeMockFs({ [entryPath]: '# Plugin Design\ncontent' })
 
-    const result = showGovernance('uni-plugin/plugin-design', ROOT, govFs, { state, globalStorePath: storePath })
+    const result = showGovernance('universal-plugin/plugin-design', ROOT, govFs, { state, globalStorePath: storePath })
 
     expect(result).not.toBeNull()
     expect(result!.scope).toBe('store')
@@ -929,15 +929,15 @@ describe('showGovernance — namespaced name', () => {
   })
 
   it('project scope overrides store for namespaced name', () => {
-    const state = stateWithPlugin('uni-plugin', '/store')
-    const projectFile = '/fake/project/governances/uni-plugin/plugin-design.md'
-    const storeFile = '/store/npm/uni-plugin@1.2.3/governances/plugin-design.md'
+    const state = stateWithPlugin('universal-plugin', '/store')
+    const projectFile = '/fake/project/governances/universal-plugin/plugin-design.md'
+    const storeFile = '/store/npm/universal-plugin@1.2.3/governances/plugin-design.md'
     const govFs = makeMockFs({
       [projectFile]: '# Override',
       [storeFile]: '# Original',
     })
 
-    const result = showGovernance('uni-plugin/plugin-design', ROOT, govFs, {
+    const result = showGovernance('universal-plugin/plugin-design', ROOT, govFs, {
       state,
       globalStorePath: '/store',
     })
@@ -957,7 +957,7 @@ Also update existing tests to pass the new optional argument:
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run governance
+cd packages/universal-plugin && pnpm test --run governance
 ```
 
 Expected: FAIL — `showGovernance` does not accept 4th argument
@@ -1022,7 +1022,7 @@ import { globalStorePath } from '../asset-store/asset-store.js'
 import * as fsNode from 'node:fs'
 
 function readGlobalState() {
-  const p = path.join(os.homedir(), '.agents', 'uni-plugin.json')
+  const p = path.join(os.homedir(), '.agents', 'universal-plugin.json')
   try {
     return mergeSafeState(JSON.parse(fsNode.readFileSync(p, 'utf8')))
   } catch {
@@ -1044,7 +1044,7 @@ function readGlobalState() {
 - [ ] **Step 5: Run tests and verify they pass**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run governance
+cd packages/universal-plugin && pnpm test --run governance
 ```
 
 Expected: all tests PASS
@@ -1052,7 +1052,7 @@ Expected: all tests PASS
 - [ ] **Step 6: Run full test suite**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run
+cd packages/universal-plugin && pnpm test --run
 ```
 
 Expected: all tests PASS
@@ -1060,9 +1060,9 @@ Expected: all tests PASS
 - [ ] **Step 7: Commit**
 
 ```bash
-git add packages/uni-plugin/src/governance/governance.ts \
-        packages/uni-plugin/src/governance/governance.test.ts \
-        packages/uni-plugin/src/governance/cli.ts
+git add packages/universal-plugin/src/governance/governance.ts \
+        packages/universal-plugin/src/governance/governance.test.ts \
+        packages/universal-plugin/src/governance/cli.ts
 git commit -m "feat(governance): support namespaced plugin-name/asset-name resolution"
 ```
 
@@ -1087,7 +1087,7 @@ import * as fsNode from 'node:fs'
 import { mergeSafeState, emptyState } from '../state/state.js'
 
 function globalStatePath(): string {
-  return path.join(os.homedir(), '.agents', 'uni-plugin.json')
+  return path.join(os.homedir(), '.agents', 'universal-plugin.json')
 }
 
 function clearStateIndex(statePath: string): void {
@@ -1135,7 +1135,7 @@ program.addCommand(cleanCommand())
 - [ ] **Step 3: Run the full test suite**
 
 ```bash
-cd packages/uni-plugin && pnpm test --run
+cd packages/universal-plugin && pnpm test --run
 ```
 
 Expected: all tests PASS
@@ -1143,7 +1143,7 @@ Expected: all tests PASS
 - [ ] **Step 4: Smoke test the clean command**
 
 ```bash
-cd packages/uni-plugin && node dist/cli.mjs clean --help
+cd packages/universal-plugin && node dist/cli.mjs clean --help
 ```
 
 Expected output includes `--state` and `--scope` flags.
@@ -1151,7 +1151,7 @@ Expected output includes `--state` and `--scope` flags.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add packages/uni-plugin/src/asset-store/cli.ts \
-        packages/uni-plugin/src/cli.ts
-git commit -m "feat(clean): add uni-plugin clean command to remove asset store"
+git add packages/universal-plugin/src/asset-store/cli.ts \
+        packages/universal-plugin/src/cli.ts
+git commit -m "feat(clean): add universal-plugin clean command to remove asset store"
 ```

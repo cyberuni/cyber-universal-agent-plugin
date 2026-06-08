@@ -8,7 +8,7 @@ Read `.plugin/plugin.json`, validate it, and write a spec-conformant vendor mani
 ## Usage
 
 ```
-uni-plugin build [options]
+universal-plugin build [options]
 ```
 
 ## Options
@@ -58,14 +58,14 @@ Unrecognized vendor keys in `vendorExtensions` emit a warning and are skipped.
 
 ```bash
 # Build all declared vendors
-uni-plugin build
+universal-plugin build
 
 # Build only Cursor
-uni-plugin build --vendor cursor
+universal-plugin build --vendor cursor
 
 # Preview without writing
-uni-plugin build --dry-run --verbose
+universal-plugin build --dry-run --verbose
 
 # Clean rebuild
-uni-plugin build --clean
+universal-plugin build --clean
 ```
