@@ -135,3 +135,44 @@ test('governance show --json returns structured output', () => {
 		fs.rmSync(root, { recursive: true, force: true })
 	}
 })
+
+test('publish sync-version writes version from packagePath into .plugin/plugin.json', () => {
+	const root = fs.mkdtempSync(path.join(os.tmpdir(), 'universal-plugin-syncver-'))
+	try {
+		fs.mkdirSync(path.join(root, '.plugin'))
+		fs.mkdirSync(path.join(root, 'pkg'), { recursive: true })
+		fs.writeFileSync(
+			path.join(root, '.plugin', 'plugin.json'),
+			JSON.stringify({ name: 'test-plugin', packagePath: 'pkg' }),
+		)
+		fs.writeFileSync(path.join(root, 'pkg', 'package.json'), JSON.stringify({ version: '3.1.0' }))
+		const result = spawnSync('node', [bin, 'publish', 'sync-version', '--root', root], {
+			encoding: 'utf8',
+			env: { ...process.env, NODE_NO_WARNINGS: '1' },
+		})
+		expect(result.status).toBe(0)
+		const manifest = JSON.parse(fs.readFileSync(path.join(root, '.plugin', 'plugin.json'), 'utf8')) as Record<string, unknown>
+		expect(manifest['version']).toBe('3.1.0')
+	} finally {
+		fs.rmSync(root, { recursive: true, force: true })
+	}
+})
+
+test('publish sync-version exits 1 when packagePath is missing from manifest', () => {
+	const root = fs.mkdtempSync(path.join(os.tmpdir(), 'universal-plugin-syncver-'))
+	try {
+		fs.mkdirSync(path.join(root, '.plugin'))
+		fs.writeFileSync(
+			path.join(root, '.plugin', 'plugin.json'),
+			JSON.stringify({ name: 'test-plugin' }),
+		)
+		const result = spawnSync('node', [bin, 'publish', 'sync-version', '--root', root], {
+			encoding: 'utf8',
+			env: { ...process.env, NODE_NO_WARNINGS: '1' },
+		})
+		expect(result.status).toBe(1)
+		expect(result.stderr).toMatch(/packagePath is required/)
+	} finally {
+		fs.rmSync(root, { recursive: true, force: true })
+	}
+})
