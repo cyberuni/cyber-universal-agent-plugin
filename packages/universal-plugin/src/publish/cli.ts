@@ -2,6 +2,7 @@ import { Command } from 'commander'
 
 import { ROOT_OPTION, resolveRoot } from '../cli-options.js'
 import { output, printFields } from '../output.js'
+import { realSyncVersionFs } from './fs.js'
 import { syncVersion } from './sync-version.js'
 
 export function publishCommand(): Command {
@@ -13,7 +14,7 @@ export function publishCommand(): Command {
 		.addOption(ROOT_OPTION)
 		.action((opts: { root?: string }) => {
 			try {
-				const result = syncVersion(resolveRoot(opts.root))
+				const result = syncVersion(resolveRoot(opts.root), realSyncVersionFs)
 				output(result, () => {
 					printFields({ version: result.version, manifest: result.manifestPath })
 				})

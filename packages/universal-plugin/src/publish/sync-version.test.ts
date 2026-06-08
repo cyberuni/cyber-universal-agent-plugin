@@ -2,6 +2,7 @@ import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { realSyncVersionFs } from './fs.js'
 import { syncVersion } from './sync-version.js'
 
 let dir: string
@@ -32,7 +33,7 @@ describe('syncVersion', () => {
 	it('throws when .plugin/plugin.json is missing', () => {
 		const empty = fs.mkdtempSync(path.join(os.tmpdir(), 'universal-plugin-empty-'))
 		try {
-			expect(() => syncVersion(empty)).toThrow(/No .plugin\/plugin.json/)
+			expect(() => syncVersion(empty, realSyncVersionFs)).toThrow(/No .plugin\/plugin.json/)
 		} finally {
 			fs.rmSync(empty, { recursive: true, force: true })
 		}
@@ -40,24 +41,24 @@ describe('syncVersion', () => {
 
 	it('throws when packagePath is missing from manifest', () => {
 		writeManifest({ name: 'my-plugin' })
-		expect(() => syncVersion(dir)).toThrow(/packagePath is required/)
+		expect(() => syncVersion(dir, realSyncVersionFs)).toThrow(/packagePath is required/)
 	})
 
 	it('throws when packagePath/package.json does not exist', () => {
 		writeManifest({ name: 'my-plugin', packagePath: 'packages/missing' })
-		expect(() => syncVersion(dir)).toThrow(/No package.json found at packages\/missing/)
+		expect(() => syncVersion(dir, realSyncVersionFs)).toThrow(/No package.json found at packages\/missing/)
 	})
 
 	it('throws when packagePath/package.json has no version', () => {
 		writeManifest({ name: 'my-plugin', packagePath: 'packages/mypkg' })
 		writePackage('packages/mypkg', { name: 'mypkg' })
-		expect(() => syncVersion(dir)).toThrow(/No version found in packages\/mypkg\/package.json/)
+		expect(() => syncVersion(dir, realSyncVersionFs)).toThrow(/No version found in packages\/mypkg\/package.json/)
 	})
 
 	it('writes version from packagePath into .plugin/plugin.json', () => {
 		writeManifest({ name: 'my-plugin', packagePath: 'packages/mypkg' })
 		writePackage('packages/mypkg', { name: 'mypkg', version: '1.2.3' })
-		const result = syncVersion(dir)
+		const result = syncVersion(dir, realSyncVersionFs)
 		expect(result.version).toBe('1.2.3')
 		expect(readManifest().version).toBe('1.2.3')
 	})
@@ -65,7 +66,7 @@ describe('syncVersion', () => {
 	it('preserves all other fields when writing', () => {
 		writeManifest({ name: 'my-plugin', description: 'desc', packagePath: 'packages/mypkg' })
 		writePackage('packages/mypkg', { version: '2.0.0' })
-		syncVersion(dir)
+		syncVersion(dir, realSyncVersionFs)
 		const manifest = readManifest()
 		expect(manifest.name).toBe('my-plugin')
 		expect(manifest.description).toBe('desc')
@@ -75,14 +76,14 @@ describe('syncVersion', () => {
 	it('returns manifestPath pointing to .plugin/plugin.json', () => {
 		writeManifest({ name: 'x', packagePath: 'pkg' })
 		writePackage('pkg', { version: '0.1.0' })
-		const result = syncVersion(dir)
+		const result = syncVersion(dir, realSyncVersionFs)
 		expect(result.manifestPath).toBe(path.join(dir, '.plugin', 'plugin.json'))
 	})
 
 	it('overwrites an existing version field', () => {
 		writeManifest({ name: 'my-plugin', version: '0.0.1', packagePath: 'packages/mypkg' })
 		writePackage('packages/mypkg', { version: '1.2.3' })
-		syncVersion(dir)
+		syncVersion(dir, realSyncVersionFs)
 		expect(readManifest().version).toBe('1.2.3')
 	})
 })
