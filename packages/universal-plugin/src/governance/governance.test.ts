@@ -5,10 +5,10 @@ import type { StateFile } from '../state/state.js'
 import { emptyState, writeAssetIndex } from '../state/state.js'
 import type { GovernanceFs } from './fs.js'
 import {
+	getLocalDir,
 	getManagedDir,
 	getPackageDir,
 	getProjectDir,
-	getLocalDir,
 	getUserDir,
 	listGovernances,
 	showGovernance,

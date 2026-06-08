@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import type { StateFile } from '../state/state.js'
 import type { GovernanceFs } from './fs.js'
 
-export type Scope = 'managed' | 'project' | 'user' | 'package' | 'store'
+export type Scope = 'managed' | 'project' | 'local' | 'user' | 'package' | 'store'
 
 export interface AssetStoreOpts {
 	state: StateFile
@@ -41,6 +41,10 @@ export function getProjectDir(root: string): string {
 	return path.join(root, 'governances')
 }
 
+export function getLocalDir(root: string): string {
+	return path.join(root, '.agents', 'governances')
+}
+
 export function getPackageDir(): string {
 	const thisFile = fileURLToPath(import.meta.url)
 	return path.join(path.dirname(thisFile), '..', 'governances')
@@ -50,6 +54,7 @@ export function getScopedPaths(root: string): ScopedPath[] {
 	return [
 		{ scope: 'managed', dir: getManagedDir() },
 		{ scope: 'project', dir: getProjectDir(root) },
+		{ scope: 'local', dir: getLocalDir(root) },
 		{ scope: 'user', dir: getUserDir() },
 		{ scope: 'package', dir: getPackageDir() },
 	]
