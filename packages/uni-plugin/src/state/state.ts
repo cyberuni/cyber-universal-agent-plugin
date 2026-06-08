@@ -29,12 +29,25 @@ export interface UniPluginUpdateEntry {
   detectedAt: string
 }
 
+export interface PluginIndexEntry {
+  source: string
+  path: string
+  version: string
+}
+
+export interface AssetIndexEntry {
+  source: string
+  version: string
+}
+
 export interface StateFile {
   schemaVersion: 1
   snapshots: Record<string, Record<string, ScopeSnapshot>>
   dismissed: Record<string, DismissedEntry>
   pendingActions: PendingAction[]
   uniPluginUpdates: Record<string, UniPluginUpdateEntry>
+  plugins: Record<string, Record<string, PluginIndexEntry>>
+  assets: Record<string, AssetIndexEntry>
 }
 
 const KNOWN_ACTION_TYPES = new Set<string>(['install', 'upgrade', 'remove'])
@@ -46,13 +59,49 @@ export function emptyState(): StateFile {
     dismissed: {},
     pendingActions: [],
     uniPluginUpdates: {},
+    plugins: {},
+    assets: {},
   }
 }
 
 export function mergeSafeState(raw: StateFile): StateFile {
   return {
     ...raw,
+    plugins: raw.plugins ?? {},
+    assets: raw.assets ?? {},
     pendingActions: (raw.pendingActions ?? []).filter((a) => KNOWN_ACTION_TYPES.has(a.type)),
+  }
+}
+
+export function writePluginIndex(
+  state: StateFile,
+  vendorId: string,
+  pluginName: string,
+  entry: PluginIndexEntry,
+): StateFile {
+  return {
+    ...state,
+    plugins: {
+      ...state.plugins,
+      [vendorId]: {
+        ...(state.plugins[vendorId] ?? {}),
+        [pluginName]: entry,
+      },
+    },
+  }
+}
+
+export function writeAssetIndex(
+  state: StateFile,
+  pluginName: string,
+  entry: AssetIndexEntry,
+): StateFile {
+  return {
+    ...state,
+    assets: {
+      ...state.assets,
+      [pluginName]: entry,
+    },
   }
 }
 

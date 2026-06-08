@@ -5,6 +5,8 @@ import {
   isDismissed,
   mergeSafeState,
   takeSnapshot,
+  writePluginIndex,
+  writeAssetIndex,
 } from './state.js'
 import type { PendingAction, StateFile } from './state.js'
 
@@ -128,6 +130,54 @@ describe('isDismissed', () => {
 
   it('returns false for unknown key', () => {
     expect(isDismissed(emptyState(), 'cursor', 'global', 'cyber-github', '1.0.0')).toBe(false)
+  })
+})
+
+describe('emptyState plugins and assets', () => {
+  it('has empty plugins and assets maps', () => {
+    const s = emptyState()
+    expect(s.plugins).toEqual({})
+    expect(s.assets).toEqual({})
+  })
+})
+
+describe('writePluginIndex', () => {
+  it('sets plugin entry for vendor and plugin name', () => {
+    const s = emptyState()
+    const updated = writePluginIndex(s, 'claude-code', 'uni-plugin', {
+      source: 'npm',
+      path: '~/.claude/plugins/uni-plugin',
+      version: '1.2.3',
+    })
+    expect(updated.plugins['claude-code']!['uni-plugin']).toEqual({
+      source: 'npm',
+      path: '~/.claude/plugins/uni-plugin',
+      version: '1.2.3',
+    })
+  })
+
+  it('does not mutate other vendor entries', () => {
+    let s = emptyState()
+    s = writePluginIndex(s, 'claude-code', 'uni-plugin', {
+      source: 'npm',
+      path: '~/.claude/plugins/uni-plugin',
+      version: '1.2.3',
+    })
+    s = writePluginIndex(s, 'cursor', 'uni-plugin', {
+      source: 'npm',
+      path: '~/.cursor/extensions/uni-plugin',
+      version: '1.2.3',
+    })
+    expect(s.plugins['claude-code']!['uni-plugin']!.path).toBe('~/.claude/plugins/uni-plugin')
+    expect(s.plugins['cursor']!['uni-plugin']!.path).toBe('~/.cursor/extensions/uni-plugin')
+  })
+})
+
+describe('writeAssetIndex', () => {
+  it('sets asset entry for plugin name', () => {
+    const s = emptyState()
+    const updated = writeAssetIndex(s, 'uni-plugin', { source: 'npm', version: '1.2.3' })
+    expect(updated.assets['uni-plugin']).toEqual({ source: 'npm', version: '1.2.3' })
   })
 })
 
