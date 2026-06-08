@@ -116,7 +116,7 @@ universal-plugin search <query> [--registry <url>] [--limit <n>] [--offset <n>]
                            [--format <format>]
 ```
 
-Searches the remote marketplace or a specified registry. Cursor-based pagination is planned (see [issue #5](https://github.com/cyberuni/cyber-universal-agent-plugin/issues/5)).
+Searches the remote marketplace or a specified registry. Cursor-based pagination is planned (see [issue #5](https://github.com/cyberuni/universal-plugin/issues/5)).
 
 **Exit codes:** `0` always (empty result is not an error)
 

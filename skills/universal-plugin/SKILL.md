@@ -14,7 +14,7 @@ When the user wants to create, inspect, update, or delete a plugin targeting Cla
 Load governance before starting:
 
 ```bash
-npx cyber-universal-agent-plugin governance show plugin-design
+npx universal-plugin governance show plugin-design
 ```
 
 Until the CLI is available, read `governances/plugin-design.md` from this plugin's installation directory. It is the authoritative source for component selection rules and anti-patterns.
@@ -102,7 +102,7 @@ In `.plugin/plugin.json`, add a `vendorExtensions` key with one entry per chosen
 
 ```json
 {
-  "$schema": "https://raw.githubusercontent.com/cyberuni/cyber-universal-agent-plugin/refs/heads/main/schema/v1.json",
+  "$schema": "https://raw.githubusercontent.com/cyberuni/universal-plugin/refs/heads/main/schema/v1.json",
   "name": "<plugin-name>",
   "version": "1.0.0",
   "description": "<description>",
@@ -130,7 +130,7 @@ In `.plugin/plugin.json`, add a `vendorExtensions` key with one entry per chosen
 ```
 
 See spec §3.3 for the full list of vendor-specific fields:
-https://github.com/cyberuni/cyber-universal-agent-plugin/blob/main/spec/universal-plugin-system.md
+https://github.com/cyberuni/universal-plugin/blob/main/spec/universal-plugin-system.md
 
 ### Step 6 — Audit skills
 
@@ -153,7 +153,7 @@ For each vendor in `vendorExtensions`:
 6. Write to the vendor output path (see Step 2 table)
 
 See spec §7 for full build rules:
-https://github.com/cyberuni/cyber-universal-agent-plugin/blob/main/spec/universal-plugin-system.md
+https://github.com/cyberuni/universal-plugin/blob/main/spec/universal-plugin-system.md
 
 ### Step 8 — Install locally for testing
 
@@ -229,6 +229,6 @@ Delete the plugin root directory. Confirm with the user before proceeding — th
 ## References
 
 - Governance: `npx cyber-skills governance show plugin-design`
-- Spec: https://github.com/cyberuni/cyber-universal-agent-plugin/blob/main/spec/universal-plugin-system.md
-- Schema: https://raw.githubusercontent.com/cyberuni/cyber-universal-agent-plugin/refs/heads/main/schema/v1.json
-- Examples: https://github.com/cyberuni/cyber-universal-agent-plugin/tree/main/examples
+- Spec: https://github.com/cyberuni/universal-plugin/blob/main/spec/universal-plugin-system.md
+- Schema: https://raw.githubusercontent.com/cyberuni/universal-plugin/refs/heads/main/schema/v1.json
+- Examples: https://github.com/cyberuni/universal-plugin/tree/main/examples

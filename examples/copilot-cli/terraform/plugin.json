@@ -1,5 +1,5 @@
 {
-	"$schema": "https://raw.githubusercontent.com/cyberuni/cyber-universal-agent-plugin/refs/heads/main/schema/v1.json",
+	"$schema": "https://raw.githubusercontent.com/cyberuni/universal-plugin/refs/heads/main/schema/v1.json",
 	"name": "terraform",
 	"description": "Infrastructure-as-code specialist agent. Generates compliant Terraform using the latest provider and module versions via registry integration and workspace management.",
 	"author": { "name": "GitHub" },

@@ -1,4 +1,4 @@
-# cyber-universal-agent-plugin
+# universal-plugin
 
 Research and design project for a universal AI coding agent plugin — a single plugin bundle that works across Claude Code, Cursor, Codex, GitHub Copilot CLI, and other major runtimes.
 

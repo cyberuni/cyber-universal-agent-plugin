@@ -1,8 +1,8 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "https://raw.githubusercontent.com/cyberuni/cyber-universal-agent-plugin/refs/heads/main/schema/v1.json",
+	"$id": "https://raw.githubusercontent.com/cyberuni/universal-plugin/refs/heads/main/schema/v1.json",
 	"title": "Universal Agent Plugin",
-	"description": "Canonical plugin definition for the cyber-universal-agent-plugin build system. Extends open-plugin-spec v1.0.0 with 'vendors' and 'vendorExtensions'.",
+	"description": "Canonical plugin definition for the universal-plugin build system. Extends open-plugin-spec v1.0.0 with 'vendors' and 'vendorExtensions'.",
 	"type": "object",
 	"required": ["name"],
 	"additionalProperties": false,

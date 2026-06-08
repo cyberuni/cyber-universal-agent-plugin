@@ -24,7 +24,7 @@ Use GitHub issues for feature planning by default. At the end of a brainstorming
 
 ## Project overview
 
-`cyber-universal-agent-plugin` is a research and design project for a universal AI coding agent plugin — a single plugin bundle that works across Claude Code, Cursor, Codex, GitHub Copilot CLI, and other major runtimes.
+`universal-plugin` is a research and design project for a universal AI coding agent plugin — a single plugin bundle that works across Claude Code, Cursor, Codex, GitHub Copilot CLI, and other major runtimes.
 
 The project is currently in the **research and design phase**. No plugin code or skills have been written yet. The primary artifact is `.research/` — structured research notes on plugin schema formats and the open-plugin-spec.
 

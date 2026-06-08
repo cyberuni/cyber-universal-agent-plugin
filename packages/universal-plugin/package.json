@@ -11,7 +11,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/cyberuni/cyber-universal-agent-plugin.git",
+		"url": "git+https://github.com/cyberuni/universal-plugin.git",
 		"directory": "packages/universal-plugin"
 	},
 	"license": "MIT",

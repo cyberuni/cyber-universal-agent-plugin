@@ -1,5 +1,5 @@
 {
-	"$schema": "https://raw.githubusercontent.com/cyberuni/cyber-universal-agent-plugin/refs/heads/main/schema/v1.json",
+	"$schema": "https://raw.githubusercontent.com/cyberuni/universal-plugin/refs/heads/main/schema/v1.json",
 	"name": "security-review",
 	"version": "1.0.0",
 	"description": "Scans authorized code to detect and confirm plausible vulnerability findings. Supports codebase investigation, change set analysis, and minimal fix preparation.",

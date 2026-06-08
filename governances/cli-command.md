@@ -134,7 +134,7 @@ Without `--vendor`, the command targets all declared vendors. An unknown `--vend
 --offset <n>    Skip the first N results (default: 0)
 ```
 
-For remote/API-backed commands, cursor-based pagination (`--cursor <token>`) is planned but not yet specified. See [issue #5](https://github.com/cyberuni/cyber-universal-agent-plugin/issues/5).
+For remote/API-backed commands, cursor-based pagination (`--cursor <token>`) is planned but not yet specified. See [issue #5](https://github.com/cyberuni/universal-plugin/issues/5).
 
 When `--format json` is used, the response object SHOULD include:
 
@@ -168,7 +168,7 @@ Verbose output goes to **stderr** so it does not pollute stdout for piped consum
 Progress lines go to **stderr**. They MUST NOT be emitted when `isAutomatedOutput()` is true. Use a simple line-by-line format:
 
 ```
-Fetching cyberuni/cyber-universal-agent-plugin...
+Fetching cyberuni/universal-plugin...
 Installing plugin: my-plugin
 Done.
 ```

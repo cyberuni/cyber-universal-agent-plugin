@@ -1,7 +1,7 @@
 # universal-plugin
 
 **Status:** In progress
-**Issue:** [#3](https://github.com/cyberuni/cyber-universal-agent-plugin/issues/3)
+**Issue:** [#3](https://github.com/cyberuni/universal-plugin/issues/3)
 
 Behavioral specifications for the `universal-plugin` CLI. Each domain has its own subfolder with a narrative spec (`spec.md`) and Gherkin scenarios (`.feature`).
 

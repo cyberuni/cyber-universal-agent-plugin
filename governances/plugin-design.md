@@ -276,4 +276,4 @@ npx cyber-skills@<version> governance show skill-repo-structure
 npx cyber-skills@<version> governance show agent-tool-output
 ```
 
-Spec: https://github.com/cyberuni/cyber-universal-agent-plugin/blob/main/spec/universal-plugin-system.md
+Spec: https://github.com/cyberuni/universal-plugin/blob/main/spec/universal-plugin-system.md

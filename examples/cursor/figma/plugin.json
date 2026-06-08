@@ -1,5 +1,5 @@
 {
-	"$schema": "https://raw.githubusercontent.com/cyberuni/cyber-universal-agent-plugin/refs/heads/main/schema/v1.json",
+	"$schema": "https://raw.githubusercontent.com/cyberuni/universal-plugin/refs/heads/main/schema/v1.json",
 	"name": "figma",
 	"description": "Translates Figma designs into code by creating and maintaining Code Connect template files that map design components to code snippets.",
 	"author": { "name": "Figma" },

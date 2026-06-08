@@ -1,5 +1,5 @@
 {
-	"$schema": "https://raw.githubusercontent.com/cyberuni/cyber-universal-agent-plugin/refs/heads/main/schema/v1.json",
+	"$schema": "https://raw.githubusercontent.com/cyberuni/universal-plugin/refs/heads/main/schema/v1.json",
 	"name": "google-drive",
 	"version": "1.0.0",
 	"description": "Read and work across Google Drive, Docs, Sheets, and Slides. Query documents with natural language and perform read/write operations.",
