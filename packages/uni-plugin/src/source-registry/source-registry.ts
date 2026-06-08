@@ -48,10 +48,12 @@ export function getStoreSegment(
   let host: string
   let repoPath: string
 
+  let normalizedSource: string | undefined
   if (source.startsWith('https://') || source.startsWith('http://')) {
     const url = new URL(source)
     host = url.hostname
     repoPath = url.pathname.replace(/^\/|\/$/g, '')
+    normalizedSource = `${url.protocol}//${url.hostname}/${repoPath}`
   } else if (source.includes('/')) {
     // owner/repo or host/owner/repo format
     const parts = source.split('/')
@@ -71,7 +73,7 @@ export function getStoreSegment(
 
   const sourceType = resolveSourceType(host, sources)
   if (sourceType === 'url') {
-    return `url/${pluginName}-${sha8(source)}@${version}`
+    return `url/${pluginName}-${sha8(normalizedSource ?? source)}@${version}`
   }
 
   return `${host}/${repoPath}@${version}`

@@ -108,6 +108,16 @@ describe('getStoreSegment', () => {
     expect(segmentWithSlash).toBe('github.com/cyberuni/uni-plugin@1.2.3')
   })
 
+  it('url: trailing slash produces same segment as no trailing slash', () => {
+    const url1 = 'https://example.com/org/repo'
+    const url2 = 'https://example.com/org/repo/'
+    expect(
+      getStoreSegment(url1, 'uni-plugin', '1.2.3', defaultSources)
+    ).toBe(
+      getStoreSegment(url2, 'uni-plugin', '1.2.3', defaultSources)
+    )
+  })
+
   it('owner/repo 2-part shorthand defaults to github.com', () => {
     expect(
       getStoreSegment('cyberuni/uni-plugin', 'uni-plugin', '1.2.3', defaultSources),
