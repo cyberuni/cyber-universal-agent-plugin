@@ -8,7 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "TODO: add your CI commands here"  # TODO: replace with actual commands
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.0.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm verify
 
   all-checks:
     needs: [ci]
