@@ -51,7 +51,7 @@ export function getStoreSegment(
   if (source.startsWith('https://') || source.startsWith('http://')) {
     const url = new URL(source)
     host = url.hostname
-    repoPath = url.pathname.replace(/^\//, '')
+    repoPath = url.pathname.replace(/^\/|\/$/g, '')
   } else if (source.includes('/')) {
     // owner/repo or host/owner/repo format
     const parts = source.split('/')
