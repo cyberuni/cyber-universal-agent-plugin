@@ -22,6 +22,10 @@ Use GitHub issues for feature planning by default. At the end of a brainstorming
 
 - **`commit-work` skill** — staging, splitting, and message writing when committing
 
+## Skill Augmentations
+
+When loading any skill, also check `.agents/skills/<name>/SKILL.md` for project-level additions and merge them with the base skill. Files in `.agents/skills/` extend (not replace) the installed skill.
+
 ## Project overview
 
 `universal-plugin` is a research and design project for a universal AI coding agent plugin — a single plugin bundle that works across Claude Code, Cursor, Codex, GitHub Copilot CLI, and other major runtimes.
