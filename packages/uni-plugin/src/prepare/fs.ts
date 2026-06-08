@@ -67,10 +67,11 @@ export function realPrepareFs(vendor: VendorConfig, projectRoot?: string): Prepa
       if (!vendor.globalPluginDir) return {}
       const pluginDir = expandHome(vendor.globalPluginDir)
       const manifest = this.readManifest()
+      const home = os.homedir()
       return Object.fromEntries(
         Object.keys(manifest).map((name) => {
           const absPath = path.join(pluginDir, name)
-          const relPath = absPath.replace(os.homedir(), '~')
+          const relPath = absPath.startsWith(home) ? '~' + absPath.slice(home.length) : absPath
           return [name, relPath]
         }),
       )
