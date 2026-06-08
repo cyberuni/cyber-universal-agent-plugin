@@ -88,7 +88,7 @@ describe('runPrepare', () => {
 })
 
 describe('runPrepare plugin index', () => {
-  it('writes plugin entry to state when plugin roots are provided', () => {
+  it('writes plugins[claude-code][uni-plugin] to state when plugin roots are provided', () => {
     const pluginRoots = { 'uni-plugin': '/home/user/.claude/plugins/uni-plugin' }
     const capturedStates: StateFile[] = []
     const fs: PrepareFs = {
@@ -103,6 +103,20 @@ describe('runPrepare plugin index', () => {
     expect(capturedStates[0]!.plugins['claude-code']!['uni-plugin']).toMatchObject({
       version: '1.2.3',
     })
+  })
+
+  it('writes assets[uni-plugin] to state when plugin roots are provided', () => {
+    const pluginRoots = { 'uni-plugin': '/home/user/.claude/plugins/uni-plugin' }
+    const capturedStates: StateFile[] = []
+    const fs: PrepareFs = {
+      readManifest: () => ({ 'uni-plugin': '1.2.3' }),
+      readPluginRoots: () => pluginRoots,
+      readGlobalState: () => emptyState(),
+      readProjectState: () => null,
+      writeGlobalState: (s) => { capturedStates.push(s) },
+      writeProjectState: () => {},
+    }
+    runPrepare({ vendorId: 'claude-code', scope: 'global', fs, now: '2026-01-01T00:00:00Z' })
     expect(capturedStates[0]!.assets['uni-plugin']).toMatchObject({ version: '1.2.3' })
   })
 })
