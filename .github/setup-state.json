@@ -10,19 +10,25 @@
     "allowUpdateBranch": true,
     "hasWiki": true,
     "hasProjects": true,
-    "hasDiscussions": false,
+    "hasDiscussions": true,
     "dependabotSecurityUpdates": "enabled",
     "secretScanning": "disabled",
     "secretScanningPushProtection": "disabled",
     "defaultBranchRuleset": null
   },
   "detected": {
-    "language": null,
-    "codeqlLanguage": null,
-    "packageManager": null,
-    "hasPackageJson": false,
+    "language": "typescript",
+    "codeqlLanguage": "javascript",
+    "packageManager": "pnpm",
+    "hasPackageJson": true,
     "hasDependabotConfig": false,
-    "existingWorkflows": []
+    "existingWorkflows": [
+      "codeql.yml",
+      "dependabot-automerge.yml",
+      "deploy-pages.yml",
+      "pull-request.yml",
+      "release.yml"
+    ]
   },
   "rows": [
     {
