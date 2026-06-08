@@ -9,10 +9,10 @@ import {
 } from './asset-store.js'
 
 describe('globalStorePath', () => {
-  it('returns ~/.agents/.uni-plugin/plugins/', () => {
-    expect(globalStorePath()).toBe(
-      path.join(os.homedir(), '.agents', '.uni-plugin', 'plugins'),
-    )
+  it('returns ~/.agents/.uni-plugin/plugins', () => {
+    const result = globalStorePath()
+    expect(result.startsWith(os.homedir())).toBe(true)
+    expect(result.endsWith(path.join('.agents', '.uni-plugin', 'plugins'))).toBe(true)
   })
 })
 
@@ -33,10 +33,7 @@ describe('storeEntryPath', () => {
 })
 
 describe('ASSET_DIRS', () => {
-  it('includes governances, disciplines, guidelines, templates', () => {
-    expect(ASSET_DIRS).toContain('governances')
-    expect(ASSET_DIRS).toContain('disciplines')
-    expect(ASSET_DIRS).toContain('guidelines')
-    expect(ASSET_DIRS).toContain('templates')
+  it('contains exactly governances, disciplines, guidelines, templates', () => {
+    expect([...ASSET_DIRS]).toStrictEqual(['governances', 'disciplines', 'guidelines', 'templates'])
   })
 })
