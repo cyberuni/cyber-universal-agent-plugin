@@ -1,6 +1,10 @@
 import * as fsNode from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
+
+function expandHome(p: string): string {
+  return p.startsWith('~') ? path.join(os.homedir(), p.slice(1)) : p
+}
 import { entryExists, populateEntry } from '../asset-store/fs.js'
 import { globalStorePath, storeEntryPath } from '../asset-store/asset-store.js'
 import { emptyState, mergeSafeState } from '../state/state.js'
@@ -42,7 +46,7 @@ export function realPrepareFs(vendor: VendorConfig, projectRoot?: string): Prepa
   return {
     readManifest(): Record<string, string> {
       if (!vendor.globalManifest) return {}
-      const manifestPath = vendor.globalManifest.replace('~', os.homedir())
+      const manifestPath = expandHome(vendor.globalManifest)
       try {
         const raw = JSON.parse(fsNode.readFileSync(manifestPath, 'utf8')) as Record<string, unknown>
         // Claude Code installed_plugins.json: keys are plugin names, values are objects with a version field
@@ -61,10 +65,14 @@ export function realPrepareFs(vendor: VendorConfig, projectRoot?: string): Prepa
     },
     readPluginRoots(): Record<string, string> {
       if (!vendor.globalPluginDir) return {}
-      const pluginDir = vendor.globalPluginDir.replace('~', os.homedir())
+      const pluginDir = expandHome(vendor.globalPluginDir)
       const manifest = this.readManifest()
       return Object.fromEntries(
-        Object.keys(manifest).map((name) => [name, path.join(pluginDir, name)]),
+        Object.keys(manifest).map((name) => {
+          const absPath = path.join(pluginDir, name)
+          const relPath = absPath.replace(os.homedir(), '~')
+          return [name, relPath]
+        }),
       )
     },
     readGlobalState: () => readStateFile(globalStatePath()) ?? emptyState(),

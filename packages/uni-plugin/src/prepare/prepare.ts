@@ -1,4 +1,3 @@
-import * as os from 'node:os'
 import { addPendingAction, emptyState, takeSnapshot, writePluginIndex, writeAssetIndex } from '../state/state.js'
 import type { StateFile } from '../state/state.js'
 import { computeDelta } from './delta.js'
@@ -35,10 +34,9 @@ export function runPrepare(opts: PrepareOptions): PrepareResult {
   const pluginRoots = prepareFs.readPluginRoots()
   for (const [pluginName, pluginPath] of Object.entries(pluginRoots)) {
     const version = currentPlugins[pluginName] ?? 'unknown'
-    const relativePath = pluginPath.replace(os.homedir(), '~')
     updatedState = writePluginIndex(updatedState, vendorId, pluginName, {
       source: 'npm',
-      path: relativePath,
+      path: pluginPath,
       version,
     })
     updatedState = writeAssetIndex(updatedState, pluginName, { source: 'npm', version })

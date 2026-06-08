@@ -29,6 +29,8 @@ export function prepareCommand(): Command {
         }
         const now = new Date().toISOString()
         const prepareFs = realPrepareFs(vendor, opts.root)
+        const pluginRoots = prepareFs.readPluginRoots()
+        const manifest = prepareFs.readManifest()
         const { newActionCount } = runPrepare({
           vendorId,
           scope: opts.scope as 'global' | 'project',
@@ -36,7 +38,7 @@ export function prepareCommand(): Command {
           now,
           dryRun: opts.dryRun,
         })
-        populateStoreFromVendorCache(prepareFs.readPluginRoots(), prepareFs.readManifest())
+        populateStoreFromVendorCache(pluginRoots, manifest)
         if (newActionCount > 0) {
           process.stdout.write(
             `${newActionCount} plugin sync action(s) pending. Run /sync to review.\n`,

@@ -1,12 +1,8 @@
-import { describe, expect, it } from 'vitest'
-import { emptyState, takeSnapshot, writePluginIndex, writeAssetIndex } from '../state/state.js'
+import { describe, expect, it, beforeEach } from 'vitest'
+import { emptyState, takeSnapshot } from '../state/state.js'
 import type { StateFile } from '../state/state.js'
 import type { PrepareFs } from './fs.js'
 import { runPrepare } from './prepare.js'
-
-// confirm writePluginIndex and writeAssetIndex exist
-void writePluginIndex
-void writeAssetIndex
 
 function makeFs(opts: {
   manifestPlugins?: Record<string, string>
@@ -88,8 +84,10 @@ describe('runPrepare', () => {
 })
 
 describe('runPrepare plugin index', () => {
-  it('writes plugins[claude-code][uni-plugin] to state when plugin roots are provided', () => {
-    const pluginRoots = { 'uni-plugin': '/home/user/.claude/plugins/uni-plugin' }
+  const pluginRoots = { 'uni-plugin': '~/.claude/plugins/uni-plugin' }
+  let capturedState: StateFile
+
+  beforeEach(() => {
     const capturedStates: StateFile[] = []
     const fs: PrepareFs = {
       readManifest: () => ({ 'uni-plugin': '1.2.3' }),
@@ -100,23 +98,14 @@ describe('runPrepare plugin index', () => {
       writeProjectState: () => {},
     }
     runPrepare({ vendorId: 'claude-code', scope: 'global', fs, now: '2026-01-01T00:00:00Z' })
-    expect(capturedStates[0]!.plugins['claude-code']!['uni-plugin']).toMatchObject({
-      version: '1.2.3',
-    })
+    capturedState = capturedStates[0]!
   })
 
-  it('writes assets[uni-plugin] to state when plugin roots are provided', () => {
-    const pluginRoots = { 'uni-plugin': '/home/user/.claude/plugins/uni-plugin' }
-    const capturedStates: StateFile[] = []
-    const fs: PrepareFs = {
-      readManifest: () => ({ 'uni-plugin': '1.2.3' }),
-      readPluginRoots: () => pluginRoots,
-      readGlobalState: () => emptyState(),
-      readProjectState: () => null,
-      writeGlobalState: (s) => { capturedStates.push(s) },
-      writeProjectState: () => {},
-    }
-    runPrepare({ vendorId: 'claude-code', scope: 'global', fs, now: '2026-01-01T00:00:00Z' })
-    expect(capturedStates[0]!.assets['uni-plugin']).toMatchObject({ version: '1.2.3' })
+  it('writes plugin entry to state', () => {
+    expect(capturedState.plugins['claude-code']!['uni-plugin']).toMatchObject({ version: '1.2.3' })
+  })
+
+  it('writes asset index entry', () => {
+    expect(capturedState.assets['uni-plugin']).toMatchObject({ version: '1.2.3' })
   })
 })
