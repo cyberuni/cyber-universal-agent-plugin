@@ -271,9 +271,9 @@ Portability rules for skill bodies: keep each `SKILL.md` body under 6,000 chars;
 ## References
 
 ```bash
-npx cyber-skills@<version> governance show skill-design
-npx cyber-skills@<version> governance show skill-repo-structure
-npx cyber-skills@<version> governance show agent-tool-output
+npx universal-plugin@<version> governance show skill-design
+npx universal-plugin@<version> governance show skill-repo-structure
+npx universal-plugin@<version> governance show agent-tool-output
 ```
 
 Spec: https://github.com/cyberuni/universal-plugin/blob/main/spec/universal-plugin-system.md
