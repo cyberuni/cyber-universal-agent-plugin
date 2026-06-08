@@ -1,6 +1,6 @@
 ---
 name: plan-command
-description: Use this skill when planning a new uni-plugin CLI command: spec.md + BDD feature file.
+description: Use this skill when planning a new uni-plugin CLI command - spec.md + BDD feature file.
 metadata:
   internal: true
 ---

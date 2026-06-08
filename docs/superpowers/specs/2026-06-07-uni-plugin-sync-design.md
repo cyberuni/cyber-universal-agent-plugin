@@ -30,7 +30,7 @@ Four components:
 
 ```
 universal-plugin SessionStart hook (one per vendor, owned by this repo)
-  npx uni-plugin@x.y.z prepare --vendor <id> [--scope global|project]
+  npx uni-plugin@x.y.z prepare <vendor-id> [--scope global|project]
         │
         ▼
 ~/.agents/uni-plugin.json  (or .agents/uni-plugin.json for project scope)
@@ -71,7 +71,7 @@ skills/
   prepare/SKILL.md          ← /prepare: first-time and new-vendor setup
 ```
 
-`universal-plugin` must be installed in a vendor before that vendor can participate in sync. When `/sync` applies an action to a vendor where `universal-plugin` is not yet installed, it installs `universal-plugin` there first.
+`universal-plugin` must be installed in at least one vendor to bootstrap sync. From that vendor, `/sync` installs `universal-plugin` in other vendors by shelling out to each vendor's CLI — no need for `universal-plugin` to already exist in the target vendor. When `/sync` applies any action to a vendor where `universal-plugin` is not yet present, it runs the target vendor's install command for `universal-plugin` first, then proceeds with the intended action.
 
 ---
 
@@ -82,11 +82,11 @@ The `SessionStart` hook lives in `universal-plugin`'s vendor-specific hook files
 ```json
 // .claude-plugin/hooks/hooks.json
 { "SessionStart": [{ "type": "command",
-    "command": "npx uni-plugin@1.2.3 prepare --vendor claude-code" }] }
+    "command": "npx uni-plugin@1.2.3 prepare claude-code" }] }
 
 // .cursor-plugin/hooks/hooks.json
 { "sessionStart": [{ "type": "command",
-    "command": "npx uni-plugin@1.2.3 prepare --vendor cursor" }] }
+    "command": "npx uni-plugin@1.2.3 prepare cursor" }] }
 ```
 
 Event name casing and `--vendor` value come from the vendor registry.
@@ -136,7 +136,8 @@ Both scopes are processed independently on every `prepare` run.
   },
   "dismissed": {
     "<vendor-id>/<scope>/<plugin-name>": {
-      "version": "<version>",
+      "reason": "version-skipped | keep",
+      "version": "<version | null>",
       "dismissedAt": "<iso8601>"
     }
   },
@@ -218,11 +219,11 @@ Detecting the current vendor requires vendor-specific knowledge. This violation 
 ### Signature
 
 ```
-uni-plugin prepare --vendor <id> [--scope global|project] [--root <path>]
+uni-plugin prepare <vendor-id> [--scope global|project] [--root <path>]
                    [--dry-run] [--format text|json]
 ```
 
-`--vendor` is required. Passed by `universal-plugin`'s `SessionStart` hook.
+`<vendor-id>` is required. Passed by `universal-plugin`'s `SessionStart` hook.
 
 `--scope` is optional. When omitted (the normal case, including the hook), `prepare` runs both scopes:
 - **Global** always: `~/.agents/uni-plugin.json`
@@ -261,7 +262,10 @@ uni-plugin prepare --vendor <id> [--scope global|project] [--root <path>]
 
 **First-run bootstrap (step 4):** no previous snapshot → treat everything as pre-existing → no actions generated → snapshot taken. Real deltas detected from second run onward.
 
-**Dismissed semantics:** keyed by `<vendor-id>/<scope>/<plugin-name>`. The `version` field records the specific version declined. Dismissing `0.2.0` does not suppress a future offer for `0.3.0`.
+**Dismissed semantics:** keyed by `<vendor-id>/<scope>/<plugin-name>`. Two reasons:
+
+- `version-skipped` — set by "don't ask again for this version" on install/upgrade actions. `version` records the declined version. A newer version clears the suppression and re-offers.
+- `keep` — set by "keep" on remove actions. `version` is `null`. Permanent: this vendor's copy is intentionally diverged and removal is never offered again regardless of version.
 
 **Exit codes:**
 - `0` — completed (with or without pending actions)
@@ -318,21 +322,26 @@ uni-plugin prepare --vendor <id> [--scope global|project] [--root <path>]
 
 ## `/prepare` skill
 
-Handles hook registration when automatic registration is unavailable or incomplete. Covers two scenarios:
+Handles hook registration when automatic registration is unavailable or incomplete. Invoked in a **conversation** (not from the CLI), in a vendor where `universal-plugin` is already installed. Covers two scenarios:
 
-1. **First-time vendor setup:** `universal-plugin` is being installed in a new vendor for the first time. Guides the user through registering the `SessionStart` hook for that vendor.
+1. **First-time vendor setup:** `universal-plugin` is being installed in a new vendor for the first time. Guides the user through installing and registering the hook.
 2. **New vendor added later:** User starts using a new vendor after `universal-plugin` was already installed elsewhere. `/prepare` registers the hook in the new vendor.
 
-When `npx uni-plugin prepare` runs and detects that `universal-plugin` is not installed in the current vendor:
+Because `universal-plugin` owns the single global `SessionStart` hook, the CLI `prepare` command can only run if the hook is already registered (it was called by the hook itself). There is no self-detection path from within a `prepare` run. Instead, `/prepare` is the entry point when:
+- The user explicitly invokes `/prepare` in a session
+- `/sync` detects a vendor where `universal-plugin` is absent and emits: "Run `/prepare` to set up `<vendor>`."
+
+### Flow
 
 ```
-universal-plugin is not installed in <vendor>.
-Install it to enable automatic sync detection.
-
-  <vendor install command>
-
-Or run /prepare in a session where universal-plugin is installed
-to be guided through setup.
+1. Ask: which vendor are you setting up?
+2. If universal-plugin not yet installed there:
+     Show: <vendor install command>
+     Wait for user to confirm install is done
+3. Check if vendor auto-registered the SessionStart hook
+     (inspect vendor's hook config or ask user to test with a new session)
+4. If not auto-registered: provide manual registration steps for that vendor
+5. Confirm: start a new session in <vendor> — "N plugin sync action(s) pending" should appear
 ```
 
 ---
@@ -401,5 +410,5 @@ Or `"noUpdateCheck": true` in `~/.agents/uni-plugin-vendors.json`.
 ## Open questions
 
 1. Which vendors auto-register hooks from a plugin's hooks.json on install? Confirmed for Claude Code; research needed for Cursor, Codex, Copilot CLI.
-2. Should `remove` pending actions have a TTL? A plugin removed from vendor A a long time ago may have been intentionally kept in vendor B; offering removal indefinitely is noisy.
-3. Should project-scope sync be opt-in (require a `.agents/uni-plugin.json` to already exist) rather than auto-created on first `prepare` run?
+2. ~~Should `remove` pending actions have a TTL?~~ Resolved: the `keep` dismissal reason handles intentional divergence permanently. No TTL needed.
+3. ~~Should project-scope sync be opt-in?~~ Resolved: auto-created on first `prepare` run is the default behavior.
