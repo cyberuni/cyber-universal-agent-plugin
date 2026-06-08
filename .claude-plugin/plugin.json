@@ -7,7 +7,6 @@
   "homepage": "https://github.com/cyberuni/universal-plugin",
   "repository": "https://github.com/cyberuni/universal-plugin",
   "license": "MIT",
-  "packagePath": "packages/universal-plugin",
   "keywords": [
     "universal",
     "plugin",
