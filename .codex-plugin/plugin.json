@@ -7,8 +7,18 @@
 	"homepage": "https://github.com/cyberuni/universal-plugin",
 	"repository": "https://github.com/cyberuni/universal-plugin",
 	"license": "MIT",
-	"keywords": ["universal", "plugin", "agent", "cross-vendor"],
-	"vendors": ["claude-code", "cursor", "codex", "copilot-cli"],
+	"keywords": [
+		"universal",
+		"plugin",
+		"agent",
+		"cross-vendor"
+	],
+	"vendors": [
+		"claude-code",
+		"cursor",
+		"codex",
+		"copilot-cli"
+	],
 	"skills": "./skills/",
-	"version": "0.1.0"
+	"version": "0.2.0"
 }
