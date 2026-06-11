@@ -103,6 +103,15 @@ Canonical definition: **skill-design** governance § Structure and § Anti-patte
 
 Warn if the skill body contains `## Why`, `## Rationale`, `## Background`, or `## Context` headings, or sustained causal explanation ("because…") that belongs in an ADR rather than executable workflow steps. Also warn on `## What Happens Next`, `## Next Steps`, or similar sections that describe CI/downstream pipeline behavior the agent cannot act on — those belong in project documentation, not skill bodies.
 
+**Q14 — SKILL.md size limit (MEDIUM)**
+Warn if SKILL.md exceeds 500 lines or approximately 5,000 tokens. Skills that exceed this threshold load too much context on every activation, crowding out conversation history and other active skills. Remediation: move detailed reference material to `references/` (see Q15) or split the skill into composable units (see Q7).
+
+**Q15 — Progressive disclosure via references/ (MEDIUM)**
+Warn if SKILL.md contains large inline reference sections (substantial prose tables, full API listings, exhaustive check definitions, etc.) that are not needed on every run. These should be in `references/` and loaded with an explicit condition — e.g., "Read `references/api-errors.md` if the API returns a non-200 status code." A generic "see `references/` for details" without a load condition does not qualify: the agent needs to know *when* to load each file, not just where it is.
+
+**Q16 — Defaults not menus (LOW)**
+Warn if the skill body presents multiple tools, libraries, or approaches as equal alternatives without naming a default. "You can use pypdf, pdfplumber, or PyMuPDF…" forces the agent to choose arbitrarily. Instead, name one default and mention alternatives only as an escape hatch for the cases where they apply.
+
 ---
 
 ## Security

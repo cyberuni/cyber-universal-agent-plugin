@@ -24,7 +24,7 @@ npx cyber-skills@<version> audit validate
 npx cyber-skills@<version> audit validate --path skills/my-skill
 ```
 
-This command can be used in CI. Full quality review (Q6–Q13, E3–E5, E7–E8, P1–P3) still requires running this agent skill. Q12–Q13 (script stdout hygiene, no rationale sections) are agent-only.
+This command can be used in CI. Full quality review (Q6–Q16, E3–E5, E7–E8, P1–P3) still requires running this agent skill. Q12–Q16 are agent-only.
 
 ### Skill design governance
 
@@ -95,6 +95,10 @@ If you need the exact criteria for any check, read `references/check-definitions
 | Q10 | Quality | SKILL.md does not instruct parsing stdout prose/tables as data | HIGH | |
 | Q11 | Quality | Skills with `scripts/` document non-interactive agent invocation (`--yes`, etc.) | HIGH | |
 | Q12 | Quality | Scripts default path: no prose on stdout without `--verbose` | MEDIUM | |
+| Q13 | Quality | No rationale/background/next-steps sections | LOW | |
+| Q14 | Quality | SKILL.md ≤ 500 lines and ~5,000 tokens | MEDIUM | |
+| Q15 | Quality | Large reference material in `references/` with explicit load conditions | MEDIUM | |
+| Q16 | Quality | Multiple alternatives have a clear default (no equal-options menus) | LOW | |
 | E1 | Security | No dangerous shell commands (SKILL.md + scripts/) | CRITICAL | |
 | E2 | Security | No prompt injection patterns (SKILL.md + scripts/) | CRITICAL | |
 | E3 | Security | No secret / credential access | CRITICAL | |
