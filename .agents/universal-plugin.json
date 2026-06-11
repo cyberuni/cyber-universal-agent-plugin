@@ -1,0 +1,4 @@
+{
+	"packagePath": "packages/universal-plugin",
+	"vendors": ["claude-code", "cursor", "codex", "copilot-cli"]
+}

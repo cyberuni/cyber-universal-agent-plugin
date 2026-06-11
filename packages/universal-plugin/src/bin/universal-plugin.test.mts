@@ -140,11 +140,10 @@ test('publish sync-version writes version from packagePath into .plugin/plugin.j
 	const root = fs.mkdtempSync(path.join(os.tmpdir(), 'universal-plugin-syncver-'))
 	try {
 		fs.mkdirSync(path.join(root, '.plugin'))
+		fs.mkdirSync(path.join(root, '.agents'))
 		fs.mkdirSync(path.join(root, 'pkg'), { recursive: true })
-		fs.writeFileSync(
-			path.join(root, '.plugin', 'plugin.json'),
-			JSON.stringify({ name: 'test-plugin', packagePath: 'pkg' }),
-		)
+		fs.writeFileSync(path.join(root, '.plugin', 'plugin.json'), JSON.stringify({ name: 'test-plugin' }))
+		fs.writeFileSync(path.join(root, '.agents', 'universal-plugin.json'), JSON.stringify({ packagePath: 'pkg' }))
 		fs.writeFileSync(path.join(root, 'pkg', 'package.json'), JSON.stringify({ version: '3.1.0' }))
 		const result = spawnSync('node', [bin, 'publish', 'sync-version', '--root', root], {
 			encoding: 'utf8',

@@ -18,13 +18,17 @@ export function syncVersion(root: string, syncFs: SyncVersionFs): SyncVersionRes
 		throw new Error(`No .plugin/plugin.json found at ${root}`)
 	}
 
+	const agentsConfigPath = path.join(root, '.agents', 'universal-plugin.json')
+	const agentsConfig = syncFs.exists(agentsConfigPath)
+		? (JSON.parse(syncFs.read(agentsConfigPath)) as Record<string, unknown>)
+		: {}
+	const packagePath = agentsConfig['packagePath']
+	if (!packagePath || typeof packagePath !== 'string') {
+		throw new Error('packagePath is required in .agents/universal-plugin.json')
+	}
+
 	const raw = syncFs.read(manifestPath)
 	const manifest = JSON.parse(raw) as Record<string, unknown>
-
-	const packagePath = manifest['packagePath']
-	if (!packagePath || typeof packagePath !== 'string') {
-		throw new Error('packagePath is required in .plugin/plugin.json')
-	}
 
 	const pkgJsonPath = path.join(root, packagePath, 'package.json')
 	if (!syncFs.exists(pkgJsonPath)) {

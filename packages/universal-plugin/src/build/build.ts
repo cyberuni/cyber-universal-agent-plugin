@@ -91,7 +91,7 @@ export function buildPlugin(root: string, opts: BuildOptions = {}): BuildResult 
 	}
 
 	const written: string[] = []
-	const { vendorExtensions: _ext, $schema: _schema, packagePath: _pkg, ...canonical } = manifest
+	const { vendorExtensions: _ext, $schema: _schema, ...canonical } = manifest
 
 	for (const vendor of vendors) {
 		const outputPath = path.join(root, VENDOR_OUTPUT[vendor])
