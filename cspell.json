@@ -1,9 +1,4 @@
 {
 	"version": "0.2",
-	"words": [
-		"esbuild",
-		"governances",
-		"orchestrative",
-		"repobuddy"
-	]
+	"words": ["esbuild", "exfiltration", "governances", "orchestrative", "repobuddy", "subdirs"]
 }
