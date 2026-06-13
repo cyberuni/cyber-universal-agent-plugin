@@ -1,6 +1,11 @@
 ---
 name: improve-skill
-description: Use this skill when improving or auditing a SKILL.md for structure, quality, and security before installing or committing.
+description: >
+  Audit, improve, or write a SKILL.md — check description trigger coverage,
+  structure, security, and agentskills.io compliance. Use when reviewing or
+  creating a skill for Claude Code, Cursor, Codex, Copilot CLI, or any
+  agentskills-compatible runtime, even if the user says "my skill isn't
+  triggering", "review before I publish", or "check this skill."
 ---
 
 # Improve Skill
@@ -87,7 +92,8 @@ If you need the exact criteria for any check, read `references/check-definitions
 | Q2 | Quality | Description is specific (not vague / matches-everything) | HIGH | |
 | Q3 | Quality | Sub-skill has `Internal skill:` prefix in description | MEDIUM | |
 | Q4 | Quality | Skill has actionable instruction body (not just description) | MEDIUM | |
-| Q5 | Quality | `description` value is ≤120 characters | MEDIUM | |
+| Q5 | Quality | `description` ≤1024 characters (spec hard limit) | HIGH | |
+| Q5a | Quality | `description` includes implicit trigger phrases or "even if they don't mention X" clause | MEDIUM | |
 | Q6 | Quality | No baked-in stack assumptions | MEDIUM | |
 | Q7 | Quality | Single workflow scope (narrow and composable) | MEDIUM | |
 | Q8 | Quality | No generic / obvious instructions the model already knows | LOW | |

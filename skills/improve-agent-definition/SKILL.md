@@ -1,6 +1,11 @@
 ---
 name: improve-agent-definition
-description: Use this skill when improving or writing an agent definition file for any major agent runtime.
+description: >
+  Audit, improve, or create a scoped agent or persona definition for any
+  major runtime — Claude Code (.claude/agents/), Cursor (.cursor/rules/ with
+  alwaysApply: false), Codex (.codex/agents/), or universal SKILL.md. Use when
+  writing, reviewing, or fixing a subagent, persona, or scoped rule, even if
+  the user doesn't say "agent definition" explicitly.
 ---
 
 # Improve Agent Definition
@@ -50,8 +55,9 @@ Read the file and evaluate every check. Produce one results table:
 | F1 | Frontmatter | `name` and `description` fields present | CRITICAL |
 | F2 | Frontmatter | `name` is kebab-case and matches file/directory name | HIGH |
 | F3 | Frontmatter | `description` starts with "Use this agent when…" | HIGH |
-| F4 | Frontmatter | `description` ≤120 characters | MEDIUM |
-| F5 | Frontmatter | `description` contains no examples | MEDIUM |
+| F4 | Frontmatter | `description` ≤1024 characters (spec hard limit) | HIGH |
+| F5 | Frontmatter | `description` contains no code blocks or slash-command syntax | MEDIUM |
+| F9 | Frontmatter | `description` includes implicit trigger phrases or "even if they don't mention X" clause | MEDIUM |
 | F6 | Frontmatter | Cursor persona has `alwaysApply: false` | HIGH |
 | B1 | Body | If persona: opens with "You are a [seniority] [role]…" | HIGH |
 | B2 | Body | Role stated in one sentence | MEDIUM |
@@ -64,7 +70,7 @@ Read the file and evaluate every check. Produce one results table:
 
 Mark each result: ✅ PASS · ⚠️ WARN · ❌ FAIL · ➖ N/A
 
-N/A rules: F6 → non-Cursor files; B1 → task agents (no role statement); B6 → very narrow single-action agents.
+N/A rules: F6 → non-Cursor files; B1 → task agents (no role statement); B6 → very narrow single-action agents; F9 → descriptions already ≥150 chars with clear trigger coverage.
 
 ### 3. Check definitions
 
@@ -77,11 +83,14 @@ Fail if `name:` is not kebab-case, or does not match the file stem / parent dire
 **F3 — Trigger language (HIGH)**
 Fail if `description` does not start with "Use this agent when…" (case-insensitive). Without this, the runtime cannot reliably decide when to delegate.
 
-**F4 — Description length (MEDIUM)**
-Fail if `description` exceeds 120 characters. Descriptions are truncated in context windows, defeating the trigger phrase.
+**F4 — Description length (HIGH)**
+Fail if `description` exceeds 1024 characters (hard spec limit). Optimal range is 150–400 characters — enough to cover the capability, a "Use when…" trigger condition, and implicit phrasing examples. A one-liner under 50 characters almost always lacks trigger coverage.
 
-**F5 — No examples in description (MEDIUM)**
-Fail if `description` contains examples of how to invoke the agent.
+**F5 — No syntax examples in description (MEDIUM)**
+Fail if `description` contains code blocks or slash-command invocation syntax (e.g. `` `/code-review` ``). Natural-language trigger phrases ("even if the user doesn't say 'review' explicitly") are encouraged and do not fail this check.
+
+**F9 — Trigger phrase coverage (MEDIUM)**
+Warn if the description covers only explicit invocations but not implicit ones. A description that lists how users naturally phrase the request — including cases where they don't name the domain directly — triggers reliably on real prompts. The pattern is: capabilities + "Use when…" + "even if they don't mention X."
 
 **F6 — Cursor alwaysApply (HIGH)**
 For Cursor `.mdc` files: fail if `alwaysApply` is missing or `true`. A persona must be opt-in (`false`); always-on rules inject into every context regardless of relevance.
@@ -130,7 +139,10 @@ If all checks pass:
 ```markdown
 ---
 name: code-reviewer
-description: Use this agent when reviewing a pull request or changed files for correctness, security, and style.
+description: >
+  Use this agent when reviewing a pull request or changed files for
+  correctness, security, and style — even if the user says "look for bugs",
+  "check this code", or doesn't mention "review" explicitly.
 tools: [Read, Grep, Glob, Bash]
 ---
 
